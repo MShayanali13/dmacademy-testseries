@@ -1,0 +1,47 @@
+
+// import { Box, Button, Card, CardContent, Grid, MenuItem, Select,  Typography, } from '@mui/material';
+// import Link from 'next/link';
+// import theme from '@/utils/theme';
+// import PageContainer from '../../components/container/PageContainer';
+
+
+// export default function SelectTest() {
+
+//   return (
+//     <PageContainer  title="Select Question Bank" description="this is select question bank page">
+//       <Typography variant="h4" gutterBottom mb={4}>Set Test</Typography>
+//       <Card>
+//         <CardContent>
+//           <Grid container spacing={2}>
+//             <Grid item xs={12} md={4}>
+//               <Typography>Select Subject</Typography>
+//               <Select fullWidth defaultValue="math">
+//                 <MenuItem value="math">Math</MenuItem>
+//                 <MenuItem value="physics">Physics</MenuItem>
+//               </Select>
+//             </Grid>
+//             <Grid item xs={12} md={4}>
+//               <Typography>Select Chapter</Typography>
+//               <Select fullWidth defaultValue="ch1">
+//                 <MenuItem value="ch1">Chapter 1</MenuItem>
+//                 <MenuItem value="ch2">Chapter 2</MenuItem>
+//               </Select>
+//             </Grid>
+//             <Grid item xs={12} md={4}>
+//               <Typography>Select Topic</Typography>
+//               <Select fullWidth defaultValue="topic1">
+//                 <MenuItem value="topic1">Topic 1</MenuItem>
+//                 <MenuItem value="topic2">Topic 2</MenuItem>
+//               </Select>
+//             </Grid>
+//             <Grid item xs={12} gap={2}>
+//               <Button variant="contained"  sx={{ mr: 2 }}>Generate Random Test</Button>
+//               <Link href={"/admin/set-question-bank"}><Button variant="outlined">Create New Test</Button></Link>
+//             </Grid>
+//           </Grid>
+//         </CardContent>
+//       </Card>
+
+//     </PageContainer>
+//   )
+// }
