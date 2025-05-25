@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { Question } from "@/types/questionType";
 
+import { unstable_noStore as noStore } from 'next/cache';
+
 type SubmittedAnswers = Record<number, string>;
 
 export async function POST(req: Request) {
+  noStore();
+  
   try {
     const body = await req.json();
     const { generatedQuestions, submittedAnswers }: {

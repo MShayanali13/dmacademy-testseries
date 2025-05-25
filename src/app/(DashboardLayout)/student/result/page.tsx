@@ -1,136 +1,194 @@
 "use client";
-
+import { useSearchParams } from "next/navigation";
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer,
+  Button,
+} from "@mui/material";
 import { useEffect, useState } from "react";
-import { Box, Typography, Button, Grid, Paper } from "@mui/material";
-import { useRouter } from "next/navigation";
+import html2pdf from "html2pdf.js";
 import { Question } from "@/types/questionType";
-
-type SubmittedAnswers = Record<number, string>;
-
-interface TestResult {
-  correct: number;
-  incorrect: number;
-  unanswered: number[];
-  score: number;
-  percentage: number;
-}
+import Loading from "@/app/loading";
 
 export default function ResultPage() {
-  const [resultData, setResultData] = useState<{
-    result: TestResult;
-    questions: Question[];
-    submittedAnswers: SubmittedAnswers;
-  } | null>(null);
+  const searchParams = useSearchParams();
 
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [submittedAnswers, setSubmittedAnswers] = useState<string[]>([]);
+  const [score, setScore] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [unansweredCount, setUnansweredCount] = useState(0);
+  const [percentage, setPercentage] = useState("0");
 
+  // useEffect(() => {
+  //   const questionsData = JSON.parse(searchParams.get("questions") || "[]");
+  //   const submittedData = JSON.parse(searchParams.get("submittedAnswers") || "[]");
+
+  //   setQuestions(questionsData);
+  //   setSubmittedAnswers(submittedData);
+
+  //   let correct = 0;
+  //   let incorrect = 0;
+  //   let unanswered = 0;
+
+  //   questionsData.forEach((q: Question, i: number) => {
+  //     const submitted = submittedData[i];
+  //     if (!submitted) {
+  //       unanswered++;
+  //     } else if (submitted === q.answer) {
+  //       correct++;
+  //     } else {
+  //       incorrect++;
+  //     }
+  //   });
+
+  //   const calculatedScore = correct * 4 - incorrect;
+  //   const total = questionsData.length;
+  //   const percentageVal = total === 0 ? "0.00" : ((correct / total) * 100).toFixed(2);
+
+  //   setCorrectCount(correct);
+  //   setIncorrectCount(incorrect);
+  //   setUnansweredCount(unanswered);
+  //   setScore(calculatedScore);
+  //   setPercentage(percentageVal);
+  //   setLoading(false);
+  // }, [searchParams]);
   useEffect(() => {
-    const data = sessionStorage.getItem("testResult");
-    if (!data) {
-    //   router.push("/student/select-test");
-      return;
-    }
-    setResultData(JSON.parse(data));
-    sessionStorage.removeItem("testResult");
-  }, [router]);
+  const stored = sessionStorage.getItem("testResult");
 
-  if (!resultData) {
-    return <Typography>Loading...</Typography>;
+  if (!stored) return;
+
+  try {
+    const parsed = JSON.parse(stored);
+    const { result, questions, submittedAnswers } = parsed;
+
+    setQuestions(questions || []);
+    setSubmittedAnswers(
+      Object.values(submittedAnswers || {}) as string[]
+    );
+
+    setCorrectCount(result?.correct || 0);
+    setIncorrectCount(result?.incorrect || 0);
+    setUnansweredCount(result?.unanswered?.length || 0);
+    setScore(result?.score || 0);
+    setPercentage(result?.percentage?.toFixed?.(2) || "0.00");
+
+    setLoading(false);
+    sessionStorage.removeItem("testResult");
+  } catch (err) {
+    console.error("Session parse error:", err);
   }
 
-  const { result, questions, submittedAnswers } = resultData;
+}, []);
 
+
+
+const handleDownload = async () => {
+  const element = document.getElementById("result-pdf");
+  if (!element) return;
+
+  const html2pdf = (await import("html2pdf.js")).default;
+
+  html2pdf()
+    .set({
+      margin: 0.5,
+      filename: "result.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, dpi: 192, letterRendering: true },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    })
+    .from(element)
+    .save();
+};
+
+
+if(loading) {
+  return(
+    <Loading />
+  )
+}
   return (
-    <Box sx={{ padding: 4, maxWidth: "900px", margin: "auto" }}>
-      <Typography variant="h4" fontWeight="bold" mb={3} align="center">
-        Test Results
+    <Box p={2} id="result-pdf">
+      <Typography variant="h4" gutterBottom>
+        Test Result Summary
       </Typography>
 
-      <Paper elevation={3} sx={{ padding: 3, mb: 4 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography variant="h6">Correct Answers:</Typography>
-            <Typography variant="body1" color="green">{result.correct}</Typography>
+      {/* Summary Boxes */}
+      <Grid container spacing={2} mb={4} mt={2}>
+        {[
+          { label: "Correct", value: correctCount, color: "#c8e6c9" },
+          { label: "Incorrect", value: incorrectCount, color: "#ffcdd2" },
+          { label: "Unanswered", value: unansweredCount, color: "#eeeeee" },
+          { label: "Score", value: score, color: "#bbdefb" },
+          { label: "Percentage", value: `${percentage}%`, color: "#fff9c4" },
+        ].map((item, idx) => (
+          <Grid item xs={6} sm={4} md={2.4} key={idx}>
+            <Paper sx={{ p: 2, textAlign: "center", backgroundColor: item.color }}>
+              <Typography variant="subtitle1">{item.label}</Typography>
+              <Typography variant="h6" fontWeight="bold">
+                {item.value}
+              </Typography>
+            </Paper>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="h6">Incorrect Answers:</Typography>
-            <Typography variant="body1" color="red">{result.incorrect}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="h6">Unanswered Questions:</Typography>
-            <Typography variant="body1">{result.unanswered.length}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="h6">Score:</Typography>
-            <Typography variant="body1">{result.score}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">Percentage:</Typography>
-            <Typography variant="body1">{result.percentage}%</Typography>
-          </Grid>
-        </Grid>
-      </Paper>
+        ))}
+      </Grid>
 
-      <Typography variant="h5" mb={2}>Detailed Review</Typography>
-
-      {questions.map((question, idx) => {
-        const userAnswer = submittedAnswers[idx];
-        const correctAnswer = question.answer;
-
-        const isCorrect = userAnswer === correctAnswer;
-        const isUnanswered = !userAnswer;
-
-        return (
-          <Paper
-            key={idx}
-            elevation={2}
-            sx={{
-              mb: 2,
-              p: 2,
-              borderLeft: isCorrect ? "5px solid green" : isUnanswered ? "5px solid gray" : "5px solid red",
-              backgroundColor: isCorrect ? "#e8f5e9" : isUnanswered ? "#f5f5f5" : "#ffebee",
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Q{idx + 1}: {question.questionType === "text" ? question.question.text : <img src={question.question.imgUrl} alt={`Question ${idx + 1}`} style={{ maxWidth: "100%", maxHeight: 150 }} />}
-            </Typography>
-
-            <Box sx={{ pl: 2 }}>
-              {question.options.map((opt, optionIndex) => {
-                const letter = String.fromCharCode(65 + optionIndex); // A, B, C, D
-
-                const isUserSelected = userAnswer === letter;
-                const isCorrectOption = correctAnswer === letter;
-
-                return (
-                  <Typography
-                    key={optionIndex}
-                    sx={{
-                      color: isCorrectOption ? "green" : isUserSelected ? "red" : "black",
-                      fontWeight: isCorrectOption || isUserSelected ? "bold" : "normal",
-                      textDecoration: isUserSelected && !isCorrectOption ? "line-through" : "none",
-                      mb: 0.5,
-                    }}
-                  >
-                    {letter}. {question.optionType === "text" ? opt.text : <img src={opt.imgUrl} alt={`Option ${letter}`} style={{ maxWidth: "150px", maxHeight: 100 }} />}
-                  </Typography>
-                );
-              })}
-            </Box>
-
-            <Typography sx={{ mt: 1, fontStyle: "italic" }}>
-              Your Answer: {isUnanswered ? "Not Answered" : userAnswer} <br />
-              Correct Answer: {correctAnswer}
-            </Typography>
-          </Paper>
-        );
-      })}
-
-      <Box sx={{ mt: 4, textAlign: "center" }}>
-        <Button variant="contained" color="primary" onClick={() => router.push("/student/select-test")}>
-          Take Another Test
+      {/* Download Button */}
+      <Box mb={3} display="flex" justifyContent="flex-end">
+        <Button variant="outlined" onClick={handleDownload}>
+          Download PDF
         </Button>
       </Box>
+
+      {/* Question-wise Details Table */}
+      <Typography variant="h6" gutterBottom>
+        Question-wise Details
+      </Typography>
+
+      <TableContainer  sx={{ border: "0.2px solid #efefef",  mt:4}}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Q. No</strong></TableCell>
+              <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Selected</strong></TableCell>
+              <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Correct</strong></TableCell>
+              <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Result</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {questions.map((q, i) => {
+              const selected = submittedAnswers[i];
+              const result =
+                !selected ? "Unanswered" : selected === q.answer ? "Correct" : "Incorrect";
+              const color =
+                result === "Correct"
+                  ? "green"
+                  : result === "Incorrect"
+                  ? "red"
+                  : "gray";
+
+              return (
+                <TableRow key={i}>
+                  <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{i + 1}</TableCell>
+                  <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{selected || "—"}</TableCell>
+                  <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{q.answer}</TableCell>
+                  <TableCell sx={{ color, fontWeight: "bold", border: "0.7px solid #888", py: 1.5, px: 2  }}>{result}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }

@@ -94,14 +94,15 @@ const handleSubmit = async () => {
 };
 
 
-
+  if (loading) {
+    return (
+    <Loading />
+    );
+  }
+  
   return (
     <PageContainer title="Set Question Bank" description="this is set question bank page">
       
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
           <QuestionTypeSelector
         onLevelChange={handleLevelChange}
         onSubjectChange={handleSubjectChange}
@@ -114,9 +115,11 @@ const handleSubmit = async () => {
             Add Question Bank
           </Typography>
 
+          <>
           {Array.from({ length: questionCount }).map((_, i) => (
             <SetQuestion key={i} qNo={i + 1} onChange={handleChange} isSubmitted={isSubmitted} />
           ))}
+          </>
 
           <Box mt={3} display="flex" gap={2}>
             <Button variant="outlined" onClick={addNewQuestion}>
@@ -130,8 +133,8 @@ const handleSubmit = async () => {
               Submit
             </Button>
           </Box>
-        </>
-      )}
+  
+    
     </PageContainer>
   );
 }

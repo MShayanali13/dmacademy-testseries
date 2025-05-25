@@ -5,9 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-      "start": "NODE_ENV=production node server.js",
-      
-      "l-start": "next start",
+    "start": "NODE_ENV=production node server.js",
+    "l-start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -29,6 +28,7 @@
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
     "formidable": "^3.5.2",
+    "html2pdf.js": "^0.10.3",
     "lodash": "4.17.21",
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.2",

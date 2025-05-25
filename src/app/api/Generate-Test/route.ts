@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongoose';
 import QuestionBankSchema from '@/model/QuestionBankSchema';
 
+import { unstable_noStore as noStore } from 'next/cache';
+
 export async function POST(req: Request) {
+    noStore();
+    
     try {
         // Parse the request body
         const body = await req.json();

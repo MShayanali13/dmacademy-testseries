@@ -3,6 +3,7 @@ import { getChaptersBySubject, getUniqueSubjects, SubjectWithChaptersType } from
 import { Box, Grid, MenuItem, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { unstable_noStore as noStore } from "next/cache";
+import Loading from "../loading";
 
 const subjectsWithChapters: Record<string, string[]> = {
   Physics: ["Kinematics", "Laws of Motion", "Gravitation"],
@@ -50,7 +51,7 @@ useEffect(() => {
   const [subjectWithChapters, setSubjectWithChapters] = useState<SubjectWithChaptersType[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [chapters, setChapters] = useState<string[]>([]);
-
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSubjectWithChapters = async () => {
@@ -66,6 +67,7 @@ useEffect(() => {
       }
     };
     fetchSubjectWithChapters();
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -108,6 +110,12 @@ useEffect(() => {
     onChapterChange(newChapter);
   };
 
+    if (loading) {
+      return (
+      <Loading />
+      );
+    }
+    
   return (
     <Box mb={0} mt={0}>
       {title&&

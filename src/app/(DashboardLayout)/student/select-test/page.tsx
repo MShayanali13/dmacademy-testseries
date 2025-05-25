@@ -9,7 +9,7 @@ import { useState } from 'react';
 const SelectTest = () => {
 
       const [isSubmitted, setIsSubmitted] = useState(false);
-
+const [loading, setLoading] = useState(true);
         const [level, setLevel] = useState<string>('');
         const [subject, setSubject] = useState<string>('');
         const [chapter, setChapter] = useState<string>('');

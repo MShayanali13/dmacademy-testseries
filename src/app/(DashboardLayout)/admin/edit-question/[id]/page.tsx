@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import QuestionTypeSelector from "../../../components/questionTypeSelector";
 import {unstable_noStore as noStore} from 'next/cache';
+import Loading from "@/app/(DashboardLayout)/loading";
 
 export default function EditQuestionPage() {
 noStore()
@@ -168,9 +169,7 @@ noStore()
 
   if (loading) {
     return (
-      <Box mt={10} textAlign="center">
-        <CircularProgress />
-      </Box>
+    <Loading />
     );
   }
 

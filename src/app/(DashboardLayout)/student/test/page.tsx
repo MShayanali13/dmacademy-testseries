@@ -4,9 +4,14 @@ import { useState, useEffect, use } from "react";
 import QuestionCard from "../../components/questionCard";
 import { Question } from "@/types/questionType";
 import { useRouter } from "next/navigation";
+import Loading from "../../loading";
+
+import { unstable_noStore as noStore } from 'next/cache';
 
 export default function TestPage() {
   // const [timeLeft, setTimeLeft] = useState(60 * 30); // 30 minutes timer (example)
+
+  noStore()
 
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -99,8 +104,9 @@ useEffect(() => {
     //   uploadedBy: "admin",
     // },
   ]);
-
   
+  
+  const [loading, setLoading] = useState(true);
   
   const generateTest = async () => {
     const params = new URLSearchParams(window.location.search);
@@ -128,6 +134,7 @@ useEffect(() => {
 
         const data = await response.json();
         setQuestions(data.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
@@ -139,7 +146,9 @@ useEffect(() => {
 },[])
 
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
-  
+
+
+
   const handleSelectOption = (questionIndex: number, optionIndex: number) => {
     setSelectedOptions((prev) => ({ ...prev, [questionIndex]: optionIndex }));
   };
@@ -188,7 +197,11 @@ const handleSubmit = async () => {
   }
 };
   
-  
+    if (loading) {
+      return (
+      <Loading />
+      );
+    }
 
   return (
     <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)", padding: 2 }}>
