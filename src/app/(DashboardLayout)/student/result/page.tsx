@@ -91,11 +91,23 @@ export default function ResultPage() {
 
 }, []);
 
-
-
 const handleDownload = async () => {
   const element = document.getElementById("result-pdf");
   if (!element) return;
+
+  // Wait for all images to load
+  const images = element.querySelectorAll("img");
+  const promises = Array.from(images).map(
+    (img) =>
+      new Promise<void>((resolve) => {
+        if (img.complete) resolve();
+        else {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        }
+      })
+  );
+  await Promise.all(promises);
 
   const html2pdf = (await import("html2pdf.js")).default;
 
@@ -104,12 +116,18 @@ const handleDownload = async () => {
       margin: 0.5,
       filename: "result.pdf",
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, dpi: 192, letterRendering: true },
+      html2canvas: {
+        scale: 2,
+        dpi: 192,
+        letterRendering: true,
+        useCORS: true, // <-- ENABLE CORS
+      },
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     })
     .from(element)
     .save();
 };
+
 
 
 if(loading) {
@@ -118,7 +136,14 @@ if(loading) {
   )
 }
   return (
-    <Box p={2} id="result-pdf">
+    <Box p={2} > 
+    {/* Download Button */}
+      <Box mb={-5} display="flex" justifyContent="flex-end">
+        <Button variant="outlined" onClick={handleDownload}>
+          Download PDF
+        </Button>
+      </Box>
+      <Box id="result-pdf" sx={{mt:0,}}>
       <Typography variant="h4" gutterBottom>
         Test Result Summary
       </Typography>
@@ -128,7 +153,7 @@ if(loading) {
         {[
           { label: "Correct", value: correctCount, color: "#c8e6c9" },
           { label: "Incorrect", value: incorrectCount, color: "#ffcdd2" },
-          { label: "Unanswered", value: unansweredCount, color: "#eeeeee" },
+          { label: "Skipped", value: unansweredCount, color: "#eeeeee" },
           { label: "Score", value: score, color: "#bbdefb" },
           { label: "Percentage", value: `${percentage}%`, color: "#fff9c4" },
         ].map((item, idx) => (
@@ -143,12 +168,7 @@ if(loading) {
         ))}
       </Grid>
 
-      {/* Download Button */}
-      <Box mb={3} display="flex" justifyContent="flex-end">
-        <Button variant="outlined" onClick={handleDownload}>
-          Download PDF
-        </Button>
-      </Box>
+     
 
       {/* Question-wise Details Table */}
       <Typography variant="h6" gutterBottom>
@@ -160,7 +180,8 @@ if(loading) {
           <TableHead>
             <TableRow>
               <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Q. No</strong></TableCell>
-              <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Selected</strong></TableCell>
+                    <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Question</strong></TableCell>
+              <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Your Answer</strong></TableCell>
               <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Correct</strong></TableCell>
               <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Result</strong></TableCell>
             </TableRow>
@@ -169,7 +190,7 @@ if(loading) {
             {questions.map((q, i) => {
               const selected = submittedAnswers[i];
               const result =
-                !selected ? "Unanswered" : selected === q.answer ? "Correct" : "Incorrect";
+                !selected ? "Skipped" : selected === q.answer ? "Correct" : "Incorrect";
               const color =
                 result === "Correct"
                   ? "green"
@@ -180,6 +201,12 @@ if(loading) {
               return (
                 <TableRow key={i}>
                   <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{i + 1}</TableCell>
+                  
+                  {q.questionType=="text"?
+                  (<TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{q.question.text}</TableCell>):
+                  (<TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><Box component="img" src={q.question.imgUrl} alt="question" crossOrigin="anonymous"  sx={{ maxWidth: '100%', maxHeight: 150, objectFit: 'contain' }} />
+</TableCell>)
+                  }
                   <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{selected || "—"}</TableCell>
                   <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{q.answer}</TableCell>
                   <TableCell sx={{ color, fontWeight: "bold", border: "0.7px solid #888", py: 1.5, px: 2  }}>{result}</TableCell>
@@ -189,6 +216,7 @@ if(loading) {
           </TableBody>
         </Table>
       </TableContainer>
+      </Box>
     </Box>
   );
 }
