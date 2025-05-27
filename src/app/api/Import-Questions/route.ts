@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import {connectDB} from "@/lib/mongoose";
 import QuestionBank from "@/model/QuestionBankSchema"; // update path as needed
+import { unstable_noStore as noStore } from "next/cache";
 
 
 
 export async function POST(request: Request) {
+    noStore()
   try {
     await connectDB(); // make sure DB connected
 

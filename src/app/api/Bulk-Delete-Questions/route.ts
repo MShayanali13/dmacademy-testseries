@@ -1,7 +1,9 @@
 import {connectDB} from "@/lib/mongoose";
 import QuestionBank from "@/model/QuestionBankSchema";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function POST(req: Request) {
+    noStore();
   await connectDB();
   const { ids } = await req.json();
 
