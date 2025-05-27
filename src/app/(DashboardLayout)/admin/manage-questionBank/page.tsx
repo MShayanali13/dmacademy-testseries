@@ -45,6 +45,7 @@ export interface QuestionData {
   level: "Easy" | "Medium" | "Difficult";
   subject: string;
   chapter: string;
+  uploadedBy: string;
   createdAt: string; // or Date if you're converting it
   updatedAt: string; // or Date
   __v: number;
