@@ -325,7 +325,7 @@ const handleDownloadExcel = () => {
   onClick={handleDownloadExcel}
   sx={{ marginTop: "20px", marginLeft: "15px" }}
 >
-  Download Excel
+  Export Questions
 </Button>
 
 {selectedQuestions.length > 0 && (
