@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import html2pdf from "html2pdf.js";
 import { Question } from "@/types/questionType";
 import Loading from "@/app/loading";
+import PageContainer from "../../components/container/PageContainer";
 
 export default function ResultPage() {
   const searchParams = useSearchParams();
@@ -136,6 +137,8 @@ if(loading) {
   )
 }
   return (
+      <PageContainer title="Result" description="this is result page">
+    
     <Box p={2} > 
     {/* Download Button */}
       <Box mb={-5} display="flex" justifyContent="flex-end">
@@ -218,5 +221,6 @@ if(loading) {
       </TableContainer>
       </Box>
     </Box>
+    </PageContainer>
   );
 }
