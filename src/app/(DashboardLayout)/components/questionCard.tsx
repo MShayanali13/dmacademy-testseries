@@ -38,7 +38,8 @@ export default function QuestionCard({index, data, selectedOption, onSelect }: P
       alt={`Question ${index + 1}`}
       width={500}
       height={300}
-      style={{ maxWidth: "500px", height: "auto", alignSelf:"center",objectFit: "contain" }}
+      style={{ maxWidth: "80vw", height: "auto", alignSelf:"center",objectFit: "contain" }}
+      
     />
   </Box>
 )}

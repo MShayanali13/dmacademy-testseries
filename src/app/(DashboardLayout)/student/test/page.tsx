@@ -206,18 +206,24 @@ const handleSubmit = async () => {
 
   return (
       <PageContainer title="Test" description="this is test page">
-    
-    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)", padding: 2 }}>
+        
+        <Typography variant="h4" style={{marginTop:"70px"}} gutterBottom>
+            Test
+          </Typography>
+    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)",justifyContent:"center",paddingLeft:"0px", maxWidth:"100vw" }}>
      
       {
         questions.length!==0?(
-          <><Box
+          <>
+          <Box
             sx={{
               position: "fixed",
-              top: 10,
+              top: 80,
               width: "90vw",
+              marginLeft:"16px",
               alignSelf: "center",
               zIndex: 10,
+              justifyContent:"center",
               backgroundColor: "#fb9a09",
               borderRadius: 2,
               color: "white",
@@ -229,14 +235,16 @@ const handleSubmit = async () => {
             <Typography variant="h5" fontWeight="bold">
               Time Left: {formatTime(timeLeft)}
             </Typography>
-          </Box><Grid
+          </Box>
+          
+          <Grid
             item
             xs={12}
             md={8}
             sx={{
-              overflowY: "scroll",
               minHeight: "100vh",
               pr: { md: 2 },
+              marginTop:"15px"
             }}
           >
               {questions.map((q, index) => (
@@ -269,6 +277,7 @@ const handleSubmit = async () => {
                   borderRadius: 2,
                   textAlign: "center",
                   color: "white",
+                  
                 }}
               >
                 <Typography variant="h6">Time Left</Typography>

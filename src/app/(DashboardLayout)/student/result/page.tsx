@@ -138,7 +138,7 @@ if(loading) {
 }
   return (
       <PageContainer title="Result" description="this is result page">
-    
+   
     <Box p={2} > 
     {/* Download Button */}
       <Box mb={-5} display="flex" justifyContent="flex-end">
