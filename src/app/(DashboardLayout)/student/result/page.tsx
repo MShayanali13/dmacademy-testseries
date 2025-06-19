@@ -137,6 +137,7 @@ if(loading) {
   )
 }
   return (
+    <Box sx={{maxWidth:"100vw"}}>
       <PageContainer title="Result" description="this is result page">
    
     <Box p={2} > 
@@ -222,5 +223,6 @@ if(loading) {
       </Box>
     </Box>
     </PageContainer>
+    </Box>
   );
 }
