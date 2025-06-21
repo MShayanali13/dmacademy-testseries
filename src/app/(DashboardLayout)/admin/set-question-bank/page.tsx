@@ -61,6 +61,8 @@ const handleSubmit = async () => {
         options: questionData.options.map((opt) => ({ value: opt })), // wrap options to match the schema
         optionType: questionData.optionType,
         answer: questionData.answer,
+        hint:questionData.hint,
+        hintType:questionData.hintType,
         level, // Add the selected level
         subject, // Add the selected subject
         chapter, // Add the selected chapter

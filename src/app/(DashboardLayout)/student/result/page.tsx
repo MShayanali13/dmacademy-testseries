@@ -186,6 +186,8 @@ if(loading) {
               <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Q. No</strong></TableCell>
                     <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Question</strong></TableCell>
               <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Your Answer</strong></TableCell>
+              <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Hint</strong></TableCell>
+             
               <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Correct</strong></TableCell>
               <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><strong>Result</strong></TableCell>
             </TableRow>
@@ -212,7 +214,13 @@ if(loading) {
 </TableCell>)
                   }
                   <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{selected || "—"}</TableCell>
-                  <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{q.answer}</TableCell>
+                  
+                  {q.hintType=="text"?
+                  (<TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{q.hint.text||"—"}</TableCell>):
+                  (<TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><Box component="img" src={q.hint.imgUrl} alt="hint" crossOrigin="anonymous"  sx={{ maxWidth: '100%', maxHeight: 150, objectFit: 'contain' }} />
+</TableCell>)
+                  }
+                    <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{q.answer}</TableCell>
                   <TableCell sx={{ color, fontWeight: "bold", border: "0.7px solid #888", py: 1.5, px: 2  }}>{result}</TableCell>
                 </TableRow>
               );

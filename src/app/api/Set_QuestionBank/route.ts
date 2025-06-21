@@ -13,6 +13,8 @@ type QuestionPayload = {
   options: { value: string }[]; // 4 options, each text or base64 image
   answer: 'A' | 'B' | 'C' | 'D';
   level: 'Easy' | 'Medium' | 'Difficult';
+  hintType:'text'|'image';
+hint:string;
   subject: string;
   chapter: string;
 };
@@ -37,6 +39,22 @@ const processedQuestions = await Promise.all(
       questionData.text = q.question;
     }
 
+
+
+ let hintData: { text: string | null; imgUrl: string | null } = { text: null, imgUrl: null };
+
+    if (q.hintType === 'image') {
+      const uploadRes = await cloudinary.uploader.upload(q.hint, {
+        folder: 'test-series/hints',
+        resource_type: 'image',
+      });
+      hintData.imgUrl = uploadRes.secure_url;
+    } else {
+      hintData.text = q.hint;
+    }
+
+
+
     const updatedOptions = await Promise.all(
       q.options.map(async (opt) => {
         if (q.optionType === 'image') {
@@ -56,6 +74,8 @@ const processedQuestions = await Promise.all(
       question: questionData,
       options: updatedOptions,
       answer: q.answer,
+      hint:hintData,
+      hintType:q.hintType,
       level: q.level,
       subject: q.subject,
       chapter: q.chapter,

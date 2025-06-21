@@ -39,6 +39,11 @@ export async function POST(request: Request) {
         subject: q.subject,
         chapter: q.chapter,
         uploadedBy: q.uploadedBy,
+        hintType:q.hintType,
+        hint:{
+          text: q["hint.text"] || "",
+          imgUrl: q["hint.imgUrl"] || "",
+        },
       };
     });
 

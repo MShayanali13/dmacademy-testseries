@@ -19,4 +19,10 @@ export interface Question {
   subject: string;
   chapter: string;
   uploadedBy?: string;
+   hintType: 'text' | 'image'; 
+  hint: {
+     text?: string;
+    imgUrl?: string;
+  };
+    
 }

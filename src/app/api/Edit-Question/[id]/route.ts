@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     await connectDB();
 
     const body = await req.json();
-    const { questionType, optionType, question, options, answer, level,chapter,subject } = body;
+    const { questionType, optionType, question, options, answer, level,chapter,subject,hintType,hint } = body;
 
     // Find the existing question by ID
     const existingQuestion = await QuestionBankSchema.findById(params.id);
@@ -28,9 +28,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         { text: null, imgUrl: null },
     ]
 
-
+ let hintData: { text: string | null; imgUrl: string | null } = { text: null, imgUrl: null };
+   
     if(existingQuestion.questionType == "image"&&existingQuestion.question.imgUrl){
         await cloudinary.uploader.destroy(existingQuestion.question.imgUrl.split('/').pop().split('.')[0]);
+    }
+     if(existingQuestion.hintData == "image"&&existingQuestion.hint.imgUrl){
+        await cloudinary.uploader.destroy(existingQuestion.hint.imgUrl.split('/').pop().split('.')[0]);
     }
     if(existingQuestion.optionType == "image"&&existingQuestion.options[0].imgUrl){
         await cloudinary.uploader.destroy(existingQuestion.options[0].imgUrl.split('/').pop().split('.')[0]);
@@ -51,6 +55,20 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       questionData.text = question.text;
         questionData.imgUrl = null;
     }
+
+    // Handle the question image upload if necessary
+    if (hintType === 'image') {
+      const uploadRes = await cloudinary.uploader.upload(question.imgUrl, {
+        folder: 'test-series/hint',
+        resource_type: 'image',
+      });
+      hintData.imgUrl = uploadRes.secure_url;
+  hintData.text = null;
+    } else {
+      hintData.text = question.text;
+        hintData.imgUrl = null;
+    }
+
     // Handle the options image upload if necessary
     await Promise.all(
     options.map(async (opt: { text: string | null; imgUrl: string | null },index:number) => {
@@ -82,7 +100,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     level: level,
     subject: subject,
     chapter: chapter,
-    uploadedBy: existingQuestion.uploadedBy
+    uploadedBy: existingQuestion.uploadedBy,
+    hintType,
+    hint:hintData,
     };
 
 

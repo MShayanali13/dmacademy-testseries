@@ -48,6 +48,15 @@ const QuestionBankSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+    hintType: {
+    type: String,
+    enum: ['text', 'image'],
+    required: true,
+  },
+  hint: {
+    text: { type: String },
+    imgUrl: { type: String },
+  },
 }, { timestamps: true });
 
 export default mongoose.models.QuestionBank || mongoose.model("QuestionBank", QuestionBankSchema);

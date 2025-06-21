@@ -32,6 +32,11 @@ import * as XLSX from "xlsx";
 export interface QuestionData {
   _id: string;
   questionType: "text" | "image";
+  hint: {
+    text: string | null;
+    imgUrl: string | null;
+  };
+  hintType: "text" | "image";
   optionType: "text" | "image";
   question: {
     text: string | null;
@@ -193,10 +198,14 @@ const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 const handleDownloadExcel = () => {
   const exportData = filteredQuestions.map((q) => ({
     questionType: q.questionType ?? "",
+    hintType: q.hintType ?? "",
     optionType: q.optionType ?? "",
 
     "question.text": q.question?.text ?? "",
     "question.imgUrl": q.question?.imgUrl ?? "",
+
+     "hint.text": q.hint?.text ?? "",
+    "hint.imgUrl": q.hint?.imgUrl ?? "",
 
     "optionA.text": q.options?.[0]?.text ?? "",
     "optionA.imgUrl": q.options?.[0]?.imgUrl ?? "",
@@ -221,6 +230,11 @@ const handleDownloadExcel = () => {
     header: [
       "questionType",
       "optionType",
+      "hintType",
+      
+      "hint.text",
+      "hint.imgUrl",
+
       "question.text",
       "question.imgUrl",
       "optionA.text",
@@ -464,7 +478,7 @@ const handleDownloadExcel = () => {
       }}
     />
   </TableCell>
-  {["Subject", "Chapter", "Level", "Question", "Options", "Answer", "Actions"].map((header) => (
+  {["Subject", "Chapter", "Level", "Question", "Options", "Answer","Hint", "Actions"].map((header) => (
     <TableCell
       key={header}
       sx={{
@@ -575,6 +589,17 @@ const handleDownloadExcel = () => {
             </ul>
           </TableCell>
           <TableCell >{q.answer}</TableCell>
+          <TableCell >
+            {q.hintType === "image" ? (
+              <img
+                src={q.hint?.imgUrl || ""}
+                alt="question"
+                style={{ maxWidth: 195, height: "auto", borderRadius: 4 }}
+              />
+            ) : (
+              <p style={{ wordBreak: "break-word" }}>{q.hint?.text}</p>
+            )}
+          </TableCell>
           <TableCell >
             <IconButton  href={`/admin/edit-question/${q._id}`} sx={{ color: "#1976d2" }}>
               <Edit />

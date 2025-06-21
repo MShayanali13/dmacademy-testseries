@@ -29,7 +29,10 @@ noStore()
   const [loading, setLoading] = useState(true);
   const [questionType, setQuestionType] = useState<"text" | "image">("text");
   const [optionType, setOptionType] = useState<"text" | "image">("text");
+  
+  const [hintType, setHintType] = useState<"text" | "image">("text");
   const [question, setQuestion] = useState<{ text: string | null; imgUrl: string | null }>({ text: "", imgUrl: null });
+  const [hint, setHint] = useState<{ text: string | null; imgUrl: string | null }>({ text: "", imgUrl: null });
   const [options, setOptions] = useState<{ text: string | null; imgUrl: string | null }[]>([
     { text: "", imgUrl: null },
     { text: "", imgUrl: null },
@@ -63,6 +66,8 @@ noStore()
 
 
   const questionImageRef = useRef<HTMLInputElement>(null);
+  
+  const hintImageRef = useRef<HTMLInputElement>(null);
   const optionImageRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -86,7 +91,9 @@ noStore()
 
         if (data) {
           setQuestionType(data.questionType);
-          setQuestion(data.question); // Set question with text or imgUrl
+          setQuestion(data.question); 
+           setHintType(data.hintType);
+          setHint(data.hint);
           setOptionType(data.optionType);
           setOptions(data.options||[
             { text: "", imgUrl: null },
@@ -114,6 +121,8 @@ noStore()
       const updatedData = {
         questionType,
         question,
+        hint,
+        hintType,
         optionType,
         options,
         answer,
@@ -164,6 +173,12 @@ noStore()
   const handleQuestionImageChange = (file: File) => {
     convertToBase64(file, (base64) => {
       setQuestion({ ...question, imgUrl: base64 });
+    });
+  };
+
+   const handleHintImageChange = (file: File) => {
+    convertToBase64(file, (base64) => {
+      setHint({ ...hint, imgUrl: base64 });
     });
   };
 
@@ -314,6 +329,65 @@ noStore()
             )}
           </Grid>
         ))}
+
+         {/* Hint Type */}
+        <Grid item xs={12}>
+          <ToggleButtonGroup
+            value={hintType}
+            exclusive
+            onChange={(e, val) => {
+              if (val) {
+                setHintType(val);
+                setHint({ text: "", imgUrl: null }); // Reset Hint if type changes
+              }
+            }}
+          >
+            <ToggleButton value="text">Text</ToggleButton>
+            <ToggleButton value="image">Image</ToggleButton>
+          </ToggleButtonGroup>
+        </Grid>
+
+        {/* Question Input */}
+        <Grid item xs={12}>
+          {hintType === "text" ? (
+            <TextField
+              label="Enter Hint"
+              fullWidth
+              multiline
+              rows={3}
+              value={hint.text || ""}
+              onChange={(e) => setHint({ ...hint, text: e.target.value })}
+            />
+          ) : (
+            <>
+              <Button variant="outlined" component="label">
+                Upload Hint Image
+                <input
+                  hidden
+                  type="file"
+                  accept="image/*"
+                  ref={hintImageRef}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleHintImageChange(file); // Handling image change
+                    }
+                  }}
+                />
+              </Button>
+              {hint?.imgUrl && (
+  <Box mt={1}>
+    <img
+      src={hint?.imgUrl || undefined}
+      alt="hint"
+      style={{ maxWidth: "250px" }}
+    />
+  </Box>
+)}
+
+            </>
+          )}
+        </Grid>
 
         {/* Correct Answer */}
         <Grid item xs={12}>
