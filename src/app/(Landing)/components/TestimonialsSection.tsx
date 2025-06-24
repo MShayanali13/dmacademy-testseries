@@ -40,21 +40,21 @@ function Testimonial({ content, name, position, imageUrl, rating }: TestimonialP
 export default function TestimonialsSection() {
   const testimonials = [
     {
-      content: "The JEE preparation at DM Academy Academy completely transformed my approach to problem-solving. Their practice questions are exactly what you face in the actual exam. I secured AIR 256 and got into IIT Bombay!",
+      content: "The JEE preparation at DM Academy completely transformed my approach to problem-solving. Their practice questions are exactly what you face in the actual exam. I secured AIR 256 and got into IIT Bombay!",
       name: "Rahul Sharma",
       position: "JEE Advanced AIR 256",
       imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80",
       rating: 5
     },
     {
-      content: "The biology coaching at DM Academy Academy is exceptional. Their detailed NCERT explanations and daily quizzes helped me master the concepts. I got into AIIMS Delhi with a NEET rank of 47!",
+      content: "The biology coaching at DM Academy is exceptional. Their detailed NCERT explanations and daily quizzes helped me master the concepts. I got into AIIMS Delhi with a NEET rank of 47!",
       name: "Priya Patel",
       position: "NEET Rank 47",
       imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80",
       rating: 5
     },
     {
-      content: "The Karnataka CET preparation at DM Academy Academy was spot on! Their state-specific question banks and mock tests were exactly like the real exam. I got into RVCE Bangalore with a CET rank of 120!",
+      content: "The Karnataka CET preparation at DM Academy was spot on! Their state-specific question banks and mock tests were exactly like the real exam. I got into RVCE Bangalore with a CET rank of 120!",
       name: "Arjun Reddy",
       position: "Karnataka CET Rank 120",
       imageUrl: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80",

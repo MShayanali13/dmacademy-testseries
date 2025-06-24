@@ -28,11 +28,11 @@ export default function Footer() {
         {/* Main Footer Content */}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, mb: 8 }}>
           {/* Company Info */}
-          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%', lg: '1 1 22%' } }}>
+          <Box sx={{ flex: { xs: '2 2 100%', md: '2 2 45%', lg: '2 2 30%' } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <SchoolIcon sx={{ fontSize: 32, color: 'white', mr: 1 }} />
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                DM Academy Academy
+                DM Academy
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ color: 'grey.400', mb: 3 }}>
@@ -52,10 +52,19 @@ export default function Footer() {
                 <InstagramIcon fontSize="small" />
               </IconButton>
             </Stack>
+            <Box>
+              <Typography color="white" fontWeight={600} style={{marginTop:"20px"}}>
+                <b><span>&nbsp;&nbsp;&nbsp;</span>  Powered By</b>
+                <br />
+                <Link  href={"https://myonlinehubs.com"}  >
+                <img src="./images/logos/logo-innovative-dark.png" style={{maxWidth:"250px",marginTop:"10px"}} />
+                </Link>
+              </Typography>
+            </Box>
           </Box>
           
           {/* Quick Links */}
-          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%', lg: '1 1 22%' } }}>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%', lg: '1 1 30%' } }}>
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
               Quick Links
             </Typography>
@@ -82,8 +91,8 @@ export default function Footer() {
           </Box>
           
           {/* Exam Resources */}
-          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%', lg: '1 1 22%' } }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
+   {/*       <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%', lg: '1 1 30%' } }}>
+             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
               Exam Resources
             </Typography>
             <Box component="ul" sx={{ p: 0, m: 0, listStyle: 'none' }}>
@@ -105,11 +114,11 @@ export default function Footer() {
                   </Link>
                 </Box>
               ))}
-            </Box>
-          </Box>
+            </Box> 
+          </Box>*/}
           
           {/* Newsletter */}
-          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%', lg: '1 1 22%' } }}>
+          <Box sx={{ flex: { xs: '2 2 100%', md: '2 2 45%', lg: '2 2 30%' } }}>
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
               Newsletter
             </Typography>
@@ -170,7 +179,7 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ color: 'grey.500', mb: { xs: 2, md: 0 } }}>
-            © {currentYear} DM Academy Academy. All rights reserved.
+            © {currentYear} DM Academy. All rights reserved.
           </Typography>
           <Stack direction="row" spacing={3}>
             {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((text) => (

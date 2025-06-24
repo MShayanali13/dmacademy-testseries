@@ -108,7 +108,7 @@ const router = useRouter();
                   display: { xs: 'none', sm: 'block' }
                 }}
               >
-                DM Academy Academy
+                DM Academy
               </Typography> */}
                 <Box sx={{width:"100%",display:"flex",justifyContent:"center",alignItems:"center",}}>
                   <Image src="/images/logos/myLogo.png" alt="Logo" width={200} height={100} style={{maxWidth:"260px",height:"auto"}}  />

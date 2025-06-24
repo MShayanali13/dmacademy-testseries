@@ -4,6 +4,7 @@ import { CheckCircle } from "lucide-react";
 
 interface ExamCardProps {
   name: string;
+  img: string;
   fullName: string;
   description: string;
   features: string[];
@@ -13,11 +14,12 @@ interface ExamCardProps {
  
 }
 
-function ExamCard({ name, fullName, description, features, color, bgColor, buttonColor }: ExamCardProps) {
+function ExamCard({ name,img, fullName, description, features, color, bgColor, buttonColor }: ExamCardProps) {
   return (
     <Card className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-      <div className={`h-48 ${bgColor} flex items-center justify-center`}>
-        <h3 className={`text-4xl font-bold ${color}`}>{name}</h3>
+      <div className={`p-0 h-48 ${bgColor} flex items-center justify-center`}>
+        {/* <h3 className={`text-4xl font-bold ${color}`}>{name}</h3> */}
+        <img src={`./images/${img}`} style={{width:"100%",height:"192px"}} alt="" />
       </div>
       <CardContent className="p-6">
         <h4 className="text-xl font-semibold mb-3">{fullName}</h4>
@@ -46,8 +48,9 @@ export default function ExamsSection() {
   const exams: ExamCardProps[] = [
     {
       name: "JEE",
+      img:"jee.png",
       fullName: "Joint Entrance Examination",
-      description: "Preparation for JEE Main & Advanced to secure admission in top engineering institutes like IITs and NITs.",
+      description: "Preparation for JEE Main & Advanced to secure admission in top engineering institutes like IITs.",
       features: [
         "Physics, Chemistry, Mathematics",
         "Previous Year Papers Analysis",
@@ -60,6 +63,7 @@ export default function ExamsSection() {
     },
     {
       name: "NEET",
+      img:"neet.jpg",
       fullName: "National Eligibility cum Entrance Test",
       description: "Comprehensive preparation for medical entrance exam to secure seats in top medical colleges.",
       features: [
@@ -74,6 +78,7 @@ export default function ExamsSection() {
     },
     {
       name: "CET",
+      img:"cet.jpg",
       fullName: "Common Entrance Test",
       description: "State-specific entrance exams for engineering, medical, and other professional courses.",
       features: [
@@ -103,6 +108,7 @@ export default function ExamsSection() {
             <ExamCard
               key={index}
               name={exam.name}
+              img={exam.img}
               fullName={exam.fullName}
               description={exam.description}
               features={exam.features}

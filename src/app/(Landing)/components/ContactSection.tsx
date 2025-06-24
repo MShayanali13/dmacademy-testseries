@@ -34,10 +34,10 @@ const contactFormSchema = z.object({
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 const companyInfo = {
-  address: "123 Education Street, Learning Hub, Tech City 12345",
-  email: "contact@DM Academy.academy",
-  phone: "+1 (555) 123-4567",
-  hours: "Mon-Fri: 9:00 AM - 6:00 PM",
+  address: "Vedika Heights, Shivaji Rd, Miraj, Maharashtra 416410",
+  email: "shayanalimujawar13@gmail.com",
+  phone: "+91 9421567466",
+  hours: "Mon-Sat: 9:00 AM - 6:00 PM",
 };
 
 export default function ContactSection() {
@@ -92,7 +92,7 @@ export default function ContactSection() {
               Address
             </Typography>
             <Typography variant="body2" className="text-gray-600">
-              1234 Main Street, Bangalore, India
+              {companyInfo.address}
             </Typography>
           </div>
         </Box>
@@ -104,7 +104,7 @@ export default function ContactSection() {
               Phone
             </Typography>
             <Typography variant="body2" className="text-gray-600">
-              +91 98765 43210
+                  {companyInfo.phone}
             </Typography>
           </div>
         </Box>
@@ -116,7 +116,7 @@ export default function ContactSection() {
               Email
             </Typography>
             <Typography variant="body2" className="text-gray-600">
-              support@example.com
+                  {companyInfo.email}
             </Typography>
           </div>
         </Box>
@@ -128,7 +128,7 @@ export default function ContactSection() {
               Office Hours
             </Typography>
             <Typography variant="body2" className="text-gray-600">
-              Mon - Fri: 9 AM - 6 PM
+                  {companyInfo.hours}
             </Typography>
           </div>
         </Box>
@@ -139,7 +139,7 @@ export default function ContactSection() {
     <div className="rounded-2 overflow-hidden shadow-md h-64 w-full">
       <iframe
         title="Our Location"
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3890.255660887441!2d77.5946!3d12.9716!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x7d0bcd8395d0c5c7!2sBangalore!5e0!3m2!1sen!2sin!4v1600000000000!5m2!1sen!2sin"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d954.770716189948!2d74.64349971983643!3d16.82224475021483!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc1230773dff2e9%3A0xa71a5edeb52b2e4f!2sInnovative%20Computer!5e0!3m2!1sen!2sin!4v1750771045444!5m2!1sen!2sin"
         width="100%"
         height="100%"
         allowFullScreen
