@@ -15,10 +15,13 @@ import { Box } from "@mui/material";
 
 
 export default function Home() {
-   const isSignIn=useUser().isSignedIn
-  useEffect(() => {
-  fetch("/api/Save-User/", { method: "POST" });
-}, [isSignIn]);
+  const { isSignedIn } = useUser();
+
+useEffect(() => {
+  if (isSignedIn) {
+    fetch("/api/Save-User/", { method: "POST" });
+  }
+}, [isSignedIn]);
   return (
   <Box 
       sx={{ 

@@ -78,7 +78,7 @@ const MSidebar = ({
                 {/* ------------------------------------------- */}
                 {/* Sidebar Items */}
                 {/* ------------------------------------------- */}
-                <SidebarItems />
+                <SidebarItems toggleMobileSidebar={()=>onSidebarClose} />
                 {/* <Upgrade /> */}
               </Box>
             </Sidebar >
@@ -123,8 +123,9 @@ const MSidebar = ({
           {/* ------------------------------------------- */}
           {/* Sidebar Items */}
           {/* ------------------------------------------- */}
-          <SidebarItems />
-          <Upgrade />
+          <SidebarItems toggleMobileSidebar={()=>onSidebarClose} />
+
+          {/* <Upgrade /> */}
         </Sidebar>
       </Box>
       {/* ------------------------------------------- */}

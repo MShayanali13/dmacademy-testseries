@@ -1,56 +1,57 @@
-'use client'
-import { Grid, Box, Typography } from '@mui/material';
-import PageContainer from '@/app/(DashboardLayout)/dashboard/components/container/PageContainer';
-// components
-// import SalesOverview from '@/app/(DashboardLayout)/components/dashboard/SalesOverview';
-// import YearlyBreakup from '@/app/(DashboardLayout)/components/dashboard/YearlyBreakup';
-// import RecentTransactions from '@/app/(DashboardLayout)/components/dashboard/RecentTransactions';
-// import ProductPerformance from '@/app/(DashboardLayout)/components/dashboard/ProductPerformance';
-// import Blog from '@/app/(DashboardLayout)/components/dashboard/Blog';
-// import MonthlyEarnings from '@/app/(DashboardLayout)/components/dashboard/MonthlyEarnings';
- 
-        // app/dashboard/page.tsx
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import PageContainer from '@/app/(DashboardLayout)/dashboard/components/container/PageContainer';
+import { Box } from '@mui/material';
+import Loading from './loading';
 
-const Dashboard = async() => { 
-   const { user } = useUser();
-  if (!user) redirect("/");
-console.log(useUser().user)
+const Dashboard = () => {
+  const { isLoaded, isSignedIn, user } = useUser();
+  const router = useRouter();
+
+  const [role, setRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isLoaded) return; // Wait until Clerk is ready
+
+    if (!isSignedIn) {
+      router.push("/"); // Redirect on client
+      return;
+    }
+
+    // Fetch role from backend
+    async function fetchRole() {
+      try {
+        const res = await fetch("/api/Get-Current-User");
+        const data = await res.json();
+        if (res.ok && data.user?.role) {
+          setRole(data.user.role);
+        }
+      } catch (error) {
+        console.error("Failed to fetch role:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRole();
+  }, [isLoaded, isSignedIn]);
+
+  if (!isLoaded || loading) {
+    return <Loading />;
+  }
+
   return (
-    <PageContainer title="Dashboard" description="this is Dashboard">
-     
-  <div className="p-8">Welcome to your dashboard, user: {user?user.username : "Unknown"} </div>
-
-
-      {/* <Box>
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={8}>
-            <SalesOverview />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <YearlyBreakup />
-              </Grid>
-              <Grid item xs={12}>
-                <MonthlyEarnings />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <RecentTransactions />
-          </Grid>
-          <Grid item xs={12} lg={8}>
-            <ProductPerformance />
-          </Grid>
-          <Grid item xs={12}>
-            <Blog />
-          </Grid>
-        </Grid>
-      </Box> */}
+    <PageContainer title="Dashboard" description="This is Dashboard">
+      <div className="p-8">
+        Welcome to your dashboard, <strong>{user?.username}</strong> <br />
+        <span className="text-gray-500">Role: {role}</span>
+      </div>
     </PageContainer>
-  )
-}
+  );
+};
 
 export default Dashboard;
