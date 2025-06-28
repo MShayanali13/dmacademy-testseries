@@ -10,12 +10,12 @@ export async function POST(req: Request) {
     try {
         // Parse the request body
         const body = await req.json();
-        const { level, subject, chapter } = body;
+        const { level, subject, chapter,course } = body;
 
         // Validate the required fields
-        if (!level || !subject || !chapter) {
+        if (!level || !subject || !chapter || !course) {
             return NextResponse.json(
-                { error: 'Missing required fields: level, subject, or chapter' },
+                { error: 'Missing required fields: level, subject, or chapter or course' },
                 { status: 400 }
             );
         }
@@ -24,8 +24,17 @@ export async function POST(req: Request) {
         await connectDB();
 
         // Fetch data from the Question schema with filters and limit
-        const questions = await QuestionBankSchema.find({ level, subject, chapter })
-            .limit(50)
+        const questions = await QuestionBankSchema.aggregate([
+  {
+    $match: {
+      level,
+      subject,
+      chapter,
+      course,
+    },
+  },
+  { $sample: { size: 50 } }, // randomly select 50 documents
+]);
            
 
         // Return the fetched data

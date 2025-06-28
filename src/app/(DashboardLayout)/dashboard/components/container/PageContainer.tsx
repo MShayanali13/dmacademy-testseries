@@ -10,7 +10,7 @@ type Props = {
 
 const PageContainer = ({ title, description, children }: Props) => (
   <HelmetProvider >
-    <div style={{maxWidth:"calc(100vw - 285px)"}}>
+    <div >
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />

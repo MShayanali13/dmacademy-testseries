@@ -35,12 +35,18 @@ export default function SetTest() {
   };
 
   const [level, setLevel] = useState<string>('');
+  
+  const [course, setCourse] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
   const [chapter, setChapter] = useState<string>('');
 
   // Handlers to update the state
   const handleLevelChange = (newLevel: string) => {
     setLevel(newLevel);
+  };
+
+   const handleCourseChange = (newCourse: string) => {
+    setCourse(newCourse);
   };
 
   const handleSubjectChange = (newSubject: string) => {
@@ -63,7 +69,8 @@ const handleSubmit = async () => {
         answer: questionData.answer,
         hint:questionData.hint,
         hintType:questionData.hintType,
-        level, // Add the selected level
+        level,
+        course,
         subject, // Add the selected subject
         chapter, // Add the selected chapter
       };
@@ -107,6 +114,7 @@ const handleSubmit = async () => {
       
           <QuestionTypeSelector
         onLevelChange={handleLevelChange}
+         onCourseChange={handleCourseChange}
         onSubjectChange={handleSubjectChange}
         onChapterChange={handleChapterChange}
         title="Select Type of Questions"

@@ -41,10 +41,12 @@ noStore()
   ]);
   const [answer, setAnswer] = useState<string>("");
   const [level, setLevel] = useState<string>('');
+  const [course, setCourse] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
   const [chapter, setChapter] = useState<string>('');
 
   const [initialLevel, setInitialLevel] = useState<string>('');
+  const [initialCourse, setInitialCourse] = useState<string>('');
   const [initialSubject, setInitialSubject] = useState<string>('');
   const [initialChapter, setInitialChapter] = useState<string>('');
 
@@ -53,6 +55,11 @@ noStore()
   // Handlers to update the state
   const handleLevelChange = (newLevel: string) => {
     setLevel(newLevel);
+  };
+
+
+   const handleCourseChange = (newCourse: string) => {
+    setCourse(newCourse);
   };
 
   const handleSubjectChange = (newSubject: string) => {
@@ -103,6 +110,7 @@ noStore()
           ]); // Set options with text or imgUrl
           setAnswer(data.answer);
           setInitialLevel(data.level);
+          setInitialCourse(data.course);
           setInitialSubject(data.subject);
           setInitialChapter(data.chapter);
         }
@@ -127,6 +135,7 @@ noStore()
         options,
         answer,
         level: level !== "" ? level : initialLevel,
+         course: course !== "" ? course : initialCourse,
         subject: subject !== "" ? subject : initialSubject,
         chapter: chapter !== "" ? chapter : initialChapter,
       };
@@ -143,7 +152,7 @@ noStore()
       if (res.ok) {
         alert("Question updated successfully!");
         setIsSubmitted(true);
-        router.push("/admin/manage-questionBank");
+        router.push("/dashboard/admin/manage-questionBank");
       } else {
         alert("Failed to update question.");
       }
@@ -153,7 +162,7 @@ noStore()
   };
 
   const handleBack = () => {
-    router.push("/admin/manage-questionBank");
+    router.push("/dashboard/admin/manage-questionBank");
   };
 
   const handleOptionChange = (index: number, value: string) => {
@@ -197,12 +206,15 @@ noStore()
         <Grid item xs={12}>
                <QuestionTypeSelector
                   onLevelChange={handleLevelChange}
+                  onCourseChange={handleCourseChange}
                   onSubjectChange={handleSubjectChange}
                   onChapterChange={handleChapterChange}
                   initialLevel={initialLevel}
+                  initialCourse={initialCourse}
                   initialSubject={initialSubject}
                   initialChapter={initialChapter}
                   title={null}
+                  new={true}
                   isSubmitted={isSubmitted}
                 />
         </Grid>
@@ -388,6 +400,23 @@ noStore()
             </>
           )}
         </Grid>
+
+<Grid item xs={12}>
+  <FormControl fullWidth>
+            <InputLabel id="ancourseswer-label">Select Course (JEE/NEET/CET)</InputLabel>
+            <Select
+              labelId="course-label"
+              value={course}
+              label="Select Course"
+              onChange={(e) => setCourse(e.target.value)}
+            >
+              <MenuItem value="JEE">JEE</MenuItem>
+              <MenuItem value="NEET">NEET</MenuItem>
+              <MenuItem value="CET">CET</MenuItem>
+              
+            </Select>
+          </FormControl>
+            </Grid>
 
         {/* Correct Answer */}
         <Grid item xs={12}>

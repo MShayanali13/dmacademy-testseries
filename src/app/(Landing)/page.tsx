@@ -1,7 +1,7 @@
 'use client'
 
 import { useUser } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ContactSection from "./components/ContactSection";
 import ExamsSection from "./components/ExamsSection";
 import FeaturesSection from "./components/FeaturesSection";
@@ -11,17 +11,32 @@ import Navbar from "./components/Navbar";
 import PricingSection from "./components/PricingSection";
 import TestimonialsSection from "./components/TestimonialsSection";
 import { Box } from "@mui/material";
+import Loading from "../loading";
+import { useRouter } from "next/navigation";
 // import "./landing.css";
 
 
 export default function Home() {
-  const { isSignedIn } = useUser();
-
+  const router=useRouter()
+  const [isLoading,setIsLoading]=useState(true)
+ const {isSignedIn,isLoaded}=useUser()
+ console.log(isLoaded)
 useEffect(() => {
+  if (!isLoaded) return; // Wait until Clerk has finished loading
+ 
+  setIsLoading(false);
+
   if (isSignedIn) {
     fetch("/api/Save-User/", { method: "POST" });
+// router.push("/dashboard")
+
   }
-}, [isSignedIn]);
+}, [isSignedIn, isLoaded]);
+
+if(isLoading){
+  return <Loading />
+}
+
   return (
   <Box 
       sx={{ 

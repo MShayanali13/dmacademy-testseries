@@ -112,10 +112,11 @@ useEffect(() => {
   const generateTest = async () => {
     const params = new URLSearchParams(window.location.search);
     const level = params.get("level");
+      const course = params.get("course");
     const subject = params.get("subject");
     const chapter = params.get("chapter");
 
-    if (level && subject && chapter) {
+    if (level && course && subject && chapter) {
       try {
         const response = await fetch("/api/Generate-Test", {
           method: "POST",
@@ -124,6 +125,7 @@ useEffect(() => {
           },
           body: JSON.stringify({
             level,
+            course,
             subject,
             chapter,
           }),
@@ -191,8 +193,8 @@ const handleSubmit = async () => {
 
     sessionStorage.setItem("testResult", JSON.stringify({ result, questions, submittedAnswers }));
     localStorage.removeItem("testEndTime");
-    // window.location.href = "/student/result";
-    Router.push("/student/result");
+    // window.location.href = "/dashboard/student/result";
+    Router.push("/dashboard/student/result");
   } catch (error) {
     console.error("Submit error:", error);
   }
@@ -207,7 +209,10 @@ const handleSubmit = async () => {
   return (
       <PageContainer title="Test" description="this is test page">
         
-        <Typography variant="h4" style={{marginTop:"70px"}} gutterBottom>
+        <Typography variant="h4" sx={{mt:"70px",display: { xs: "block", md: "none" }}} gutterBottom>
+            Test
+          </Typography>
+             <Typography variant="h4" sx={{mt:"20px",display: { xs: "none", md: "block" }}} gutterBottom>
             Test
           </Typography>
     <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)",justifyContent:"center",paddingLeft:"0px", maxWidth:"100vw" }}>
@@ -315,14 +320,16 @@ const handleSubmit = async () => {
 
               </Box>
 
-              <Button variant="contained" onClick={handleSubmit} color="error" size="large">
-                Submit Test
+              <Button variant="contained" onClick={handleSubmit}  color="error" size="large">
+                Submit Test as
               </Button>
             </Grid><Box
               sx={{
-                mt: 4,
-                mb: 6,
-                justifyContent: "center",
+                ml: 2,
+                pb: 5,
+                width:"100%",
+                
+                justifyContent:"start",
                 display: { xs: "flex", md: "none" },
               }}
             >

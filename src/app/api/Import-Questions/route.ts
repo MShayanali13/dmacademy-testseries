@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         ],
         answer: q.answer,
         level: q.level,
+           course: q.course,
         subject: q.subject,
         chapter: q.chapter,
         uploadedBy: q.uploadedBy,

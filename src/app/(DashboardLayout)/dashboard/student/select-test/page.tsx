@@ -11,12 +11,18 @@ const SelectTest = () => {
       const [isSubmitted, setIsSubmitted] = useState(false);
 const [loading, setLoading] = useState(true);
         const [level, setLevel] = useState<string>('');
+        
+        const [course, setCourse] = useState<string>('');
         const [subject, setSubject] = useState<string>('');
         const [chapter, setChapter] = useState<string>('');
       
         // Handlers to update the state
         const handleLevelChange = (newLevel: string) => {
           setLevel(newLevel);
+        };
+
+        const handleCourseChange = (newCourse: string) => {
+          setCourse(newCourse);
         };
       
         const handleSubjectChange = (newSubject: string) => {
@@ -43,7 +49,7 @@ const [loading, setLoading] = useState(true);
           //   .then((data) => {
           //     console.log('Test generated:', data);
               setIsSubmitted(true);
-              window.location.href = '/student/test?level=' + level + '&subject=' + subject + '&chapter=' + chapter;
+              window.location.href = '/dashboard/student/test?level=' + level + '&subject=' + subject + '&chapter=' + chapter+"&course="+course;
             // })
             // .catch((error) => {
             //   console.error('Error generating test:', error);        
@@ -58,6 +64,8 @@ const [loading, setLoading] = useState(true);
           onSubjectChange={handleSubjectChange}
           title="Select Your Test"
           onLevelChange={handleLevelChange}
+          
+          onCourseChange={handleCourseChange}
   isSubmitted={isSubmitted}     />
      
      <Button
@@ -66,7 +74,7 @@ const [loading, setLoading] = useState(true);
         onClick={
           startTest
         }
-        // href='/student/test'
+        // href='/dashboard/student/test'
         sx={{ marginTop: '20px' }}
         disabled={!level || !subject || !chapter}
       >

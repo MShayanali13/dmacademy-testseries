@@ -1,140 +1,187 @@
 "use client";
-import { getChaptersBySubject, getUniqueSubjects, SubjectWithChaptersType } from "@/lib/getSubjectWiseChapter";
+
 import { Box, Grid, MenuItem, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { unstable_noStore as noStore } from "next/cache";
 import Loading from "../loading";
-
-const subjectsWithChapters: Record<string, string[]> = {
-  Physics: ["Kinematics", "Laws of Motion", "Gravitation"],
-  Chemistry: ["Atomic Structure", "Thermodynamics", "Organic Chemistry"],
-  Biology: ["Cell Structure", "Genetics", "Human Physiology"],
-  Math: ["Quadratic Equations", "Calculus", "Probability"]
-};
 
 interface QuestionTypeSelectorProps {
   onLevelChange: (newLevel: string) => void;
+  onCourseChange: (newCourse: string) => void;
   onSubjectChange: (newSubject: string) => void;
   onChapterChange: (newChapter: string) => void;
   title: string | null;
   isSubmitted: boolean;
   initialLevel?: string;
+  initialCourse?: string;
   initialSubject?: string;
   initialChapter?: string;
+  new?: boolean;
 }
+
+type FilterCombo = {
+  course: string;
+  level: string;
+  subject: string;
+};
+
+type SubjectChapter = {
+  subject: string;
+  chapter: string;
+};
 
 export default function QuestionTypeSelector({
   onLevelChange,
+  onCourseChange,
   onSubjectChange,
   onChapterChange,
   title,
   isSubmitted,
   initialLevel,
+  initialCourse,
   initialSubject,
   initialChapter,
+  new: isNew = false,
 }: QuestionTypeSelectorProps) {
+  const [course, setCourse] = useState("");
+  const [level, setLevel] = useState("");
+  const [subject, setSubject] = useState("");
+  const [chapter, setChapter] = useState("");
 
-  noStore()
-
-  const [level, setLevel] = useState<string>("");
-  const [subject, setSubject] = useState<string>("");
-  const [chapter, setChapter] = useState<string>("");
-
-useEffect(() => {
-  if (initialLevel&&initialSubject&&initialChapter) {
-    setLevel(initialLevel);
-    setSubject(initialSubject);
-    setChapter(initialChapter);
-  }
-}, [initialLevel,initialSubject,initialChapter]);
-
-  const [subjectWithChapters, setSubjectWithChapters] = useState<SubjectWithChaptersType[]>([]);
-  const [subjects, setSubjects] = useState<string[]>([]);
+  const [allData, setAllData] = useState<FilterCombo[]>([]);
   const [chapters, setChapters] = useState<string[]>([]);
-const [loading, setLoading] = useState(true);
+
+  const [courses, setCourses] = useState<string[]>([]);
+  const [levels, setLevels] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSubjectWithChapters = async () => {
-      const res = await fetch("/api/Fetch-SubjectWithChapters",{cache:"no-store"});
-      if (!res.ok) {
-        console.error("Failed to fetch subjects");
-        return;
-      }
+    if (initialCourse) setCourse(initialCourse);
+    if (initialLevel) setLevel(initialLevel);
+    if (initialSubject) setSubject(initialSubject);
+    if (initialChapter) setChapter(initialChapter);
+  }, [initialCourse, initialLevel, initialSubject, initialChapter]);
+
+  useEffect(() => {
+    if (isSubmitted) {
+      setCourse("");
+      setLevel("");
+      setSubject("");
+      setChapter("");
+      setChapters([]);
+    }
+  }, [isSubmitted]);
+
+  useEffect(() => {
+    const fetchFilters = async () => {
+      const res = await fetch(`/api/Get-availage-filter?type=${isNew ? "all" : "filtered"}`);
+      if (!res.ok) return;
       const json = await res.json();
       if (json.success) {
-        setSubjectWithChapters(json.data);
-        setSubjects(getUniqueSubjects(json.data));
+        setAllData(json.data);
+        setCourses(Array.from(new Set(json.data.map((d: FilterCombo) => d.course))));
       }
+      setLoading(false);
     };
-    fetchSubjectWithChapters();
-    setLoading(false);
+    fetchFilters();
   }, []);
 
   useEffect(() => {
-    if (subject) {
-      setChapters(getChaptersBySubject(subjectWithChapters, subject));
-    } else {
-      setChapters([]);
+    if (!course) {
+      setLevels([]);
+      setLevel("");
+      setSubjects([]);
+      setSubject("");
+      return;
     }
-  }, [subject, subjectWithChapters]);
+    const filtered = allData.filter((d) => d.course === course);
+    setLevels(Array.from(new Set(filtered.map((d) => d.level))));
+    setLevel("");
+    setSubjects([]);
+    setSubject("");
+    setChapters([]);
+  }, [course]);
 
-const resetForm = () => {
-  setLevel("");
-  setChapter("");
-  setSubject("");
+  useEffect(() => {
+    if (!course || !level) return;
+    const filtered = allData.filter((d) => d.course === course && d.level === level);
+    setSubjects(Array.from(new Set(filtered.map((d) => d.subject))));
+    setSubject("");
+    setChapters([]);
+  }, [level]);
 
-};
-useEffect(() => {
-  if (isSubmitted) {
-    resetForm();
-  }
-}, [isSubmitted]);
-  // Handlers for state change
-  const handleLevelSelect = (e: React.ChangeEvent<{ value: unknown }>) => {
-    const newLevel = e.target.value as string;
-    setLevel(newLevel);
-    onLevelChange(newLevel);
+  useEffect(() => {
+    if (!subject||!course||!level) return;
+    const fetchChapters = async () => {
+    const res = await fetch(`/api/Fetch-SubjectWithChapters?course=${course}&level=${level}&subject=${subject}`);
+
+      if (!res.ok) return;
+      const json = await res.json();
+    if (json.success) {
+  setChapters(json.data);
+}
+    };
+    fetchChapters();
+  }, [subject]);
+
+  const handleCourseChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    const val = e.target.value as string;
+    setCourse(val);
+    onCourseChange(val);
   };
 
-  const handleSubjectSelect = (e: React.ChangeEvent<{ value: unknown }>) => {
-    const newSubject = e.target.value as string;
-    setSubject(newSubject);
-    onSubjectChange(newSubject);
-    // Reset chapter when subject changes
-    setChapter("");
+  const handleLevelChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    const val = e.target.value as string;
+    setLevel(val);
+    onLevelChange(val);
   };
 
-  const handleChapterSelect = (e: React.ChangeEvent<{ value: unknown }>) => {
-    const newChapter = e.target.value as string;
-    setChapter(newChapter);
-    onChapterChange(newChapter);
+  const handleSubjectChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    const val = e.target.value as string;
+    setSubject(val);
+    onSubjectChange(val);
   };
 
-    if (loading) {
-      return (
-      <Loading />
-      );
-    }
-    
+  const handleChapterChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    const val = e.target.value as string;
+    setChapter(val);
+    onChapterChange(val);
+  };
+
+  if (loading) return <Loading />;
+
   return (
     <Box mb={0} mt={0}>
-      {title&&
-      <Typography variant="h5" mb={3} gutterBottom>
-        {title? title : ""}
-      </Typography>
-}
+      {title && (
+        <Typography variant="h5" mb={3}>
+          {title}
+        </Typography>
+      )}
       <Grid container spacing={2}>
+        <Grid item xs={12} sm={4}>
+          <TextField label="Course" select fullWidth value={course} onChange={handleCourseChange}>
+            {courses.map((c) => (
+              <MenuItem key={c} value={c}>
+                {c}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
         <Grid item xs={12} sm={4}>
           <TextField
             label="Level"
             select
             fullWidth
             value={level}
-            onChange={handleLevelSelect}
+            onChange={handleLevelChange}
+            disabled={!course}
           >
-            <MenuItem value="Easy">Easy</MenuItem>
-            <MenuItem value="Medium">Medium</MenuItem>
-            <MenuItem value="Difficult">Difficult</MenuItem>
+            {levels.map((l) => (
+              <MenuItem key={l} value={l}>
+                {l}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
 
@@ -144,11 +191,12 @@ useEffect(() => {
             select
             fullWidth
             value={subject}
-            onChange={handleSubjectSelect}
+            onChange={handleSubjectChange}
+            disabled={!level}
           >
-            {subjects.map((subj) => (
-              <MenuItem key={subj} value={subj}>
-                {subj}
+            {subjects.map((s) => (
+              <MenuItem key={s} value={s}>
+                {s}
               </MenuItem>
             ))}
           </TextField>
@@ -160,12 +208,12 @@ useEffect(() => {
             select
             fullWidth
             value={chapter}
-            onChange={handleChapterSelect}
+            onChange={handleChapterChange}
             disabled={!subject}
           >
-            {chapters.map((chap) => (
-              <MenuItem key={chap} value={chap}>
-                {chap}
+            {chapters.map((c) => (
+              <MenuItem key={c} value={c}>
+                {c}
               </MenuItem>
             ))}
           </TextField>

@@ -16,7 +16,8 @@ export interface Question {
   options: Option[];  // always 4 options
   answer: 'A' | 'B' | 'C' | 'D';
   level: 'Easy' | 'Medium' | 'Difficult'; // typo in Difficult but keep as per your model
-  subject: string;
+  course: string;
+   subject: string;
   chapter: string;
   uploadedBy?: string;
    hintType: 'text' | 'image'; 

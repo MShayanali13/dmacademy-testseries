@@ -20,18 +20,26 @@ type MenuItemType = {
   subheader?: string;
 };
 
-const SidebarItems = ({ toggleMobileSidebar }: { toggleMobileSidebar: () => void }) => {
+  interface SidebarItemsProps {
+  toggleMobileSidebar: () => void;
+}
+
+const SidebarItems = ({ toggleMobileSidebar }: SidebarItemsProps) => {
   const pathname = usePathname();
   const pathDirect = pathname;
   const [userData, setUserData] = useState<UserData | null>(null);
+const [isLoading,setIsLoading]=useState(true)
+
 
   useEffect(() => {
     async function fetchData() {
+      
       const res = await fetch("/api/Get-Current-User");
       const data = await res.json();
       if (res.ok) {
         setUserData(data.user);
       }
+     
     }
 
     fetchData();
@@ -44,6 +52,7 @@ const SidebarItems = ({ toggleMobileSidebar }: { toggleMobileSidebar: () => void
     (userData?.role === "teacher" && TeacherMenuitems) ||
     [];
 
+    
   return (
     <Box sx={{ px: 3 ,borderTop:"1px solid #dcdcdc"}}>
       <List sx={{ pt: 3, }} className="sidebarNav" component="div">

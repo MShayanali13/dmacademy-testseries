@@ -3,11 +3,13 @@ import SidebarItems from "./SidebarItems";
 import { Upgrade } from "./Updrade";
 import { Sidebar, Logo } from 'react-mui-sidebar';
 import Image from "next/image";
+import { useState } from "react";
 
 interface ItemType {
   isMobileSidebarOpen: boolean;
   onSidebarClose: (event: React.MouseEvent<HTMLElement>) => void;
   isSidebarOpen: boolean;
+  
 }
 
 const MSidebar = ({
@@ -16,6 +18,9 @@ const MSidebar = ({
   isSidebarOpen,
 }: ItemType) => {
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up("lg"));
+
+// const [isSidebarLoaded, setIsSidebarLoaded] = useState(true);
+
 
   const sidebarWidth = "270px";
 
@@ -78,7 +83,7 @@ const MSidebar = ({
                 {/* ------------------------------------------- */}
                 {/* Sidebar Items */}
                 {/* ------------------------------------------- */}
-                <SidebarItems toggleMobileSidebar={()=>onSidebarClose} />
+                <SidebarItems toggleMobileSidebar={()=>onSidebarClose}  />
                 {/* <Upgrade /> */}
               </Box>
             </Sidebar >
@@ -123,7 +128,7 @@ const MSidebar = ({
           {/* ------------------------------------------- */}
           {/* Sidebar Items */}
           {/* ------------------------------------------- */}
-          <SidebarItems toggleMobileSidebar={()=>onSidebarClose} />
+          <SidebarItems toggleMobileSidebar={()=>onSidebarClose}  />
 
           {/* <Upgrade /> */}
         </Sidebar>

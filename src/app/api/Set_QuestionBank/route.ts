@@ -13,6 +13,7 @@ type QuestionPayload = {
   options: { value: string }[]; // 4 options, each text or base64 image
   answer: 'A' | 'B' | 'C' | 'D';
   level: 'Easy' | 'Medium' | 'Difficult';
+  course:string;
   hintType:'text'|'image';
 hint:string;
   subject: string;
@@ -77,6 +78,7 @@ const processedQuestions = await Promise.all(
       hint:hintData,
       hintType:q.hintType,
       level: q.level,
+         course: q.course,
       subject: q.subject,
       chapter: q.chapter,
       uploadedBy: 'admin', // Replace with actual user ID if available

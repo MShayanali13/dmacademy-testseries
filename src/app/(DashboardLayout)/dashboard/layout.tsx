@@ -3,8 +3,9 @@ import { styled, Container, Box } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Header from "./layout/header/Header";
 import Sidebar from "./layout/sidebar/Sidebar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import Loading from "./loading";
 
 
 const MainWrapper = styled("div")(() => ({
@@ -33,20 +34,48 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router=useRouter()
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const pathname = usePathname(); // 👈 Get current URL
+const [isLoading,setIsLoading]=useState(true)
+
+const [isTestPage,setIsTestPage]=useState(false)
 
   // Pages where sidebar should be hidden
   const hideSidebarPaths = [
-    "/student/test",
+    "/dashboard/student/test",
   ]  
 
   const shouldHideSidebar = hideSidebarPaths.includes(pathname);
- const isSignIn=useUser().isSignedIn
-  useEffect(() => {
-  fetch("/api/Save-User/", { method: "POST" });
-}, [isSignIn]);
+ const {isSignedIn,isLoaded}=useUser()
+useEffect(() => {
+  if (!isLoaded) return; // Wait until Clerk has finished loading
+
+  if (isSignedIn) {
+    fetch("/api/Save-User/", { method: "POST" });
+    setIsLoading(false);
+  } else {
+    router.push("/");
+  }
+}, [isSignedIn, isLoaded]);
+
+useEffect(()=>{
+if (typeof window !== 'undefined') {
+  setIsTestPage(window?.location.pathname.includes("/student/test"))
+}
+},[])
+// useEffect(()=>{
+// if(isSignIn&&isTestPage){
+//   setIsLoading(false)
+// }
+// },[isSignIn,isTestPage])
+
+
+
+if(isLoading){
+  return <Loading />
+}
   return (
     <MainWrapper className="mainwrapper">
       {/* ------------------------------------------- */}
@@ -61,7 +90,7 @@ export default function RootLayout({
       {/* ------------------------------------------- */}
       {/* Main Wrapper */}
       {/* ------------------------------------------- */}
-      <PageWrapper className="page-wrapper">
+      <PageWrapper className={`page-wrapper ${!isTestPage&&"custom-lg-xl:max-w-[calc(100vw-277px)]"}`}>
         {/* ------------------------------------------- */}
         {/* Header */}
         {/* ------------------------------------------- */}

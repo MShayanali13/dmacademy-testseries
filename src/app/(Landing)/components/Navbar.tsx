@@ -138,7 +138,7 @@ const router = useRouter();
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
            
              <SignedOut>
-          <SignInButton mode="modal"    >
+          <SignInButton mode="modal"  >
              <Button 
               variant="outlined" 
               color="primary"

@@ -27,6 +27,7 @@ import QuestionTypeSelector from "../../components/questionTypeSelector";
 import { unstable_noStore as noStore } from "next/cache";
 
 import * as XLSX from "xlsx";
+import Loading from "../../loading";
 
 // Define the type for a question
 export interface QuestionData {
@@ -48,6 +49,7 @@ export interface QuestionData {
   }[];
   answer: "A" | "B" | "C" | "D";
   level: "Easy" | "Medium" | "Difficult";
+  course: string;
   subject: string;
   chapter: string;
   uploadedBy: string;
@@ -65,6 +67,7 @@ export default function ManageQuestionBank() {
   const [questions, setQuestions] = useState<QuestionData[]>([]);
 
   const [level, setLevel] = useState<string>("");
+  const [course, setCourse] = useState<string>("");
     const [subject, setSubject] = useState<string>("");
     const [chapter, setChapter] = useState<string>("");
   
@@ -73,7 +76,7 @@ export default function ManageQuestionBank() {
     const [chapters, setChapters] = useState<string[]>([]);
     const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
 
-  
+  const [isLoading,setIsLoading]=useState(true)
     
 
     useEffect(() => {
@@ -120,13 +123,19 @@ export default function ManageQuestionBank() {
   const subjectMatch = subject ? q.subject.toLowerCase().includes(subject.toLowerCase()) : true;
   const chapterMatch = chapter ? q.chapter.toLowerCase().includes(chapter.toLowerCase()) : true;
   const levelMatch = level ? q.level.toLowerCase().includes(level.toLowerCase()) : true;
+const courseMatch = course ? q.course.toLowerCase().includes(course.toLowerCase()) : true;
 
-  return subjectMatch && chapterMatch && levelMatch;
+  return subjectMatch && chapterMatch && levelMatch&&courseMatch;
 });
 
 
 const handleLevelChange = (newLevel: string) => {
   setLevel(newLevel);
+};
+
+
+const handleCourseChange = (newCourse: string) => {
+  setCourse(newCourse);
 };
 
 const handleSubjectChange = (newSubject: string) => {
@@ -221,6 +230,7 @@ const handleDownloadExcel = () => {
 
     answer: q.answer ?? "",
     level: q.level ?? "",
+     course: q.course ?? "",
     subject: q.subject ?? "",
     chapter: q.chapter ?? "",
     uploadedBy: q.uploadedBy ?? "",
@@ -247,6 +257,7 @@ const handleDownloadExcel = () => {
       "optionD.imgUrl",
       "answer",
       "level",
+      "course",
       "subject",
       "chapter",
       "uploadedBy",
@@ -258,6 +269,18 @@ const handleDownloadExcel = () => {
 
   XLSX.writeFile(workbook, "QuestionBank.xlsx");
 };
+
+
+useEffect(()=>{
+if(filteredQuestions){
+  setIsLoading(false)
+}
+},[filteredQuestions])
+
+
+if(isLoading){
+  return <Loading />
+}
 
 
   return (
@@ -272,6 +295,7 @@ const handleDownloadExcel = () => {
           <Grid item xs={12} sm={12}>
             <QuestionTypeSelector
               onLevelChange={handleLevelChange}
+               onCourseChange={handleCourseChange}
               onSubjectChange={handleSubjectChange}
               onChapterChange={handleChapterChange}
               
@@ -408,7 +432,7 @@ const handleDownloadExcel = () => {
       fontSize: "0.9rem",
       
       border: "1px solid rgb(197, 197, 197)",
-      borderBottom: "2px solid #d0d7de",
+      
       textAlign: "left",
     },
     "& tbody td": {
@@ -446,7 +470,7 @@ const handleDownloadExcel = () => {
               color: "#fff",
               fontWeight: "bold",
               border: "1px solid #efefef",
-              backgroundColor: "#1976d2",
+            
               position: "sticky",
               top: 0,
               zIndex: 1,
@@ -456,14 +480,14 @@ const handleDownloadExcel = () => {
           </TableCell>
         ))}
       </TableRow> */}
-      <TableRow sx={{ backgroundColor: "#1976d2" }}>
+      <TableRow>
   <TableCell
     padding="checkbox"
     sx={{
       position: "sticky",
       top: 0,
       zIndex: 1,
-      backgroundColor: "#1976d2",
+    padding:"10px 21px"
     }}
   >
     <input
@@ -478,17 +502,19 @@ const handleDownloadExcel = () => {
       }}
     />
   </TableCell>
-  {["Subject", "Chapter", "Level", "Question", "Options", "Answer","Hint", "Actions"].map((header) => (
+  {["Subject", "Chapter", "Level", "Question", "Options", "Answer","Hint","Course", "Actions"].map((header) => (
     <TableCell
       key={header}
       sx={{
         color: "#fff",
         fontWeight: "bold",
         border: "1px solid #efefef",
-        backgroundColor: "#1976d2",
+      
         position: "sticky",
         top: 0,
         zIndex: 1,
+        
+        
       }}
     >
       {header}
@@ -508,7 +534,7 @@ const handleDownloadExcel = () => {
             "&:hover": { backgroundColor: "#e3f2fd" },
           }}
         >
-          <TableCell padding="checkbox">
+          <TableCell padding="checkbox" sx={{padding:"0 21px 0 21px"}}>
   <input
     type="checkbox"
     checked={selectedQuestions.includes(q._id)}
@@ -600,8 +626,9 @@ const handleDownloadExcel = () => {
               <p style={{ wordBreak: "break-word" }}>{q.hint?.text}</p>
             )}
           </TableCell>
+           <TableCell >{q.course}</TableCell>
           <TableCell >
-            <IconButton  href={`/admin/edit-question/${q._id}`} sx={{ color: "#1976d2" }}>
+            <IconButton  href={`/dashboard/admin/edit-question/${q._id}`} sx={{ color: "#1976d2" }}>
               <Edit />
             </IconButton>
             <IconButton onClick={() => handleDelete(q._id)} sx={{ color: "#d32f2f" }}>

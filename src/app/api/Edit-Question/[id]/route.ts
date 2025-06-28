@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     await connectDB();
 
     const body = await req.json();
-    const { questionType, optionType, question, options, answer, level,chapter,subject,hintType,hint } = body;
+    const { questionType, optionType, question, options, answer, level,course,chapter,subject,hintType,hint } = body;
 
     // Find the existing question by ID
     const existingQuestion = await QuestionBankSchema.findById(params.id);
@@ -58,14 +58,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     // Handle the question image upload if necessary
     if (hintType === 'image') {
-      const uploadRes = await cloudinary.uploader.upload(question.imgUrl, {
+      const uploadRes = await cloudinary.uploader.upload(hint.imgUrl, {
         folder: 'test-series/hint',
         resource_type: 'image',
       });
       hintData.imgUrl = uploadRes.secure_url;
   hintData.text = null;
     } else {
-      hintData.text = question.text;
+      hintData.text = hint.text;
         hintData.imgUrl = null;
     }
 
@@ -98,6 +98,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     options: optionsData,
     answer: answer,
     level: level,
+    course: course,
     subject: subject,
     chapter: chapter,
     uploadedBy: existingQuestion.uploadedBy,
