@@ -120,10 +120,11 @@ export default function ManageQuestionBank() {
   }, []);
 
  const filteredQuestions = questions.filter((q) => {
-  const subjectMatch = subject ? q.subject.toLowerCase().includes(subject.toLowerCase()) : true;
-  const chapterMatch = chapter ? q.chapter.toLowerCase().includes(chapter.toLowerCase()) : true;
-  const levelMatch = level ? q.level.toLowerCase().includes(level.toLowerCase()) : true;
-const courseMatch = course ? q.course.toLowerCase().includes(course.toLowerCase()) : true;
+  // console.log(q)
+  const subjectMatch = subject ? q.subject?.toLowerCase().includes(subject.toLowerCase()) : true;
+  const chapterMatch = chapter ? q.chapter?.toLowerCase().includes(chapter.toLowerCase()) : true;
+  const levelMatch = level ? q.level?.toLowerCase().includes(level.toLowerCase()) : true;
+const courseMatch = course ? q.course?.toLowerCase().includes(course.toLowerCase()) : true;
 
   return subjectMatch && chapterMatch && levelMatch&&courseMatch;
 });
