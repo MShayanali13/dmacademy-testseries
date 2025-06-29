@@ -55,7 +55,7 @@ useEffect(() => {
   if (isSignedIn) {
     fetch("/api/Save-User/", { method: "POST" });
     setIsLoading(false);
-  } else {
+  } else{
     router.push("/");
   }
 }, [isSignedIn, isLoaded]);

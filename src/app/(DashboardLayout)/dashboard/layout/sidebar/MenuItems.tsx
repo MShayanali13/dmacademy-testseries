@@ -43,6 +43,12 @@ const AdminMenuitems = [
   },
   {
     id: uniqueId(),
+    title: "Manage Users",
+    icon: IconAperture,
+    href: "/dashboard/admin/manage-users",
+  },
+  {
+    id: uniqueId(),
     title: "Manage Question Bank",
     icon: IconAperture,
     href: "/dashboard/admin/manage-questionBank",
