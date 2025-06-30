@@ -118,6 +118,7 @@ const handleSubmit = async () => {
         onSubjectChange={handleSubjectChange}
         onChapterChange={handleChapterChange}
         title="Select Type of Questions"
+        new={true}
         isSubmitted={isSubmitted}
       />
 

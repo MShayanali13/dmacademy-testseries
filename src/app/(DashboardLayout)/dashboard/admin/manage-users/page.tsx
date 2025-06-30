@@ -18,6 +18,10 @@ import {
   Grid,
   MenuItem,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import { Edit, Delete, Cancel } from "@mui/icons-material";
 import PageContainer from "../../components/container/PageContainer";
@@ -94,6 +98,53 @@ export default function ManageQuestionBank() {
 
 
 const [isSubmitted, setIsSubmitted] = useState(false);
+const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+const [editingUser, setEditingUser] = useState<Partial<UserData> | null>(null);
+
+const openAddUserModal = () => {
+  setEditingUser(null);
+  setIsUserModalOpen(true);
+};
+
+const openEditUserModal = (user: UserData) => {
+  setEditingUser(user);
+  setIsUserModalOpen(true);
+};
+
+const handleUserSubmit = async (formData: Partial<UserData>) => {
+  try {
+    const isEdit = !!editingUser;
+
+    const response = await fetch(
+      isEdit ? `/api/Edit-User/${editingUser!._id}` : "/api/Create-User",
+      {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      }
+    );
+
+    if (response.ok) {
+      alert(isEdit ? "User updated!" : "User created!");
+      setIsUserModalOpen(false);
+      setEditingUser(null);
+
+      const updated = await response.json();
+      setUsers((prev) => {
+        if (isEdit) {
+          return prev.map((u) => (u._id === updated.user._id ? updated.user : u));
+        } else {
+          return [...prev, updated.user];
+        }
+      });
+    } else {
+      alert("Failed to save user");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
+  }
+};
 
 
 const handleDownloadExcel = () => {
@@ -145,50 +196,65 @@ if(isLoading){
         <Typography variant="h4" mb={4}>
           Users
         </Typography>
-        
+      <Grid container justifyContent={"space-between"}> 
+        <Grid item>
 <Button
   variant="contained"
   color="primary"
   onClick={handleDownloadExcel}
-  sx={{ marginTop: "20px", marginLeft: "15px" }}
+  sx={{ marginTop: "20px" }}
 >
   Export Users
 </Button>
 
+{/* </Grid>   */}
+{/* <Grid item> */}
+<Button
+  variant="contained"
+  color="primary"
+  onClick={openAddUserModal}
+  sx={{  marginTop: "20px", marginLeft: "15px" }}
+>
+  Add New User
+</Button>
+</Grid>
+<Grid item> 
 {selectedUsers.length > 0 && (
   <Button
-    variant="contained"
-    color="error"
-    sx={{ marginTop: "20px", marginLeft: "15px" }}
-    onClick={async () => {
-      const confirmDelete = confirm("Are you sure you want to delete selected Users?");
-      if (!confirmDelete) return;
+  variant="contained"
+  color="error"
+  sx={{ marginTop: "20px", marginLeft: "15px" }}
+  onClick={async () => {
+    const confirmDelete = confirm("Are you sure you want to delete selected Users?");
+    if (!confirmDelete) return;
+    
+    try {
+      const res = await fetch("/api/Bulk-Delete-Users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids: selectedUsers }),
+      });
 
-      try {
-        const res = await fetch("/api/Bulk-Delete-Users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ids: selectedUsers }),
-        });
-
-        if (res.ok) {
-          alert("Selected Users deleted successfully");
-          setUsers(prev => prev.filter(q => !selectedUsers.includes(q._id)));
-          setSelectedUsers([]);
-        } else {
-          alert("Failed to delete selected Users");
-        }
-      } catch (error) {
-        console.error(error);
-        alert("Something went wrong");
+      if (res.ok) {
+        alert("Selected Users deleted successfully");
+        setUsers(prev => prev.filter(q => !selectedUsers.includes(q._id)));
+        setSelectedUsers([]);
+      } else {
+        alert("Failed to delete selected Users");
       }
-    }}
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
+  }}
   >
     Delete Selected ({selectedUsers.length})
   </Button>
 )}
+</Grid>
+</Grid>
       </Box>
 
       {/* ✅ Table Scroll Wrapper */}
@@ -360,9 +426,9 @@ if(isLoading){
            
            <TableCell >{u.role}</TableCell>
           <TableCell >
-            {/* <IconButton  href={`/dashboard/admin/edit-question/${u._id}`} sx={{ color: "#1976d2" }}>
+            <IconButton onClick={() => openEditUserModal(u)} sx={{ color: "#1976d2" }}>
               <Edit />
-            </IconButton> */}
+            </IconButton>
             <IconButton onClick={() => handleDelete(u._id)} sx={{ color: "#d32f2f" }}>
               <Delete />
             </IconButton>
@@ -374,6 +440,13 @@ if(isLoading){
 </TableContainer>
 
         </Box>
+        <UserFormModal
+  open={isUserModalOpen}
+  onClose={() => setIsUserModalOpen(false)}
+  onSubmit={handleUserSubmit}
+  initialData={editingUser || undefined}
+/>
+
       </Box>
     </PageContainer>
   );
@@ -382,3 +455,101 @@ if(isLoading){
 
 
 
+function UserFormModal({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (data: Partial<UserData>) => void;
+  initialData?: Partial<UserData>;
+}) {
+  const [formData, setFormData] = useState<Partial<UserData>>({
+    username: "",
+    email: "",
+    name: "",
+    role: "student",
+    isSubscribed: false,
+  });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        username: initialData.username || "",
+        email: initialData.email || "",
+        name: initialData.name || "",
+        role: initialData.role || "student",
+        isSubscribed: initialData.isSubscribed || false,
+      });
+    }
+  }, [initialData]);
+
+  const handleChange = (field: keyof UserData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.username || !formData.email || !formData.name || !formData.role) {
+      alert("Please fill all required fields");
+      return;
+    }
+    onSubmit(formData);
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{initialData ? "Edit User" : "Add New User"}</DialogTitle>
+      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+        <TextField
+          label="Username"
+          value={formData.username}
+          onChange={(e) => handleChange("username", e.target.value)}
+          fullWidth
+        />
+        <TextField
+          label="Email"
+          value={formData.email}
+          onChange={(e) => handleChange("email", e.target.value)}
+          fullWidth
+        />
+        <TextField
+          label="Name"
+          value={formData.name}
+          onChange={(e) => handleChange("name", e.target.value)}
+          fullWidth
+        />
+        <TextField
+          label="Role"
+          select
+          value={formData.role}
+          onChange={(e) => handleChange("role", e.target.value)}
+          fullWidth
+        >
+          {["student", "teacher", "college", "admin"].map((role) => (
+            <MenuItem key={role} value={role}>
+              {role}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          label="Is Subscribed"
+          select
+          value={formData.isSubscribed ? "true" : "false"}
+          onChange={(e) => handleChange("isSubscribed", e.target.value === "true")}
+          fullWidth
+        >
+          <MenuItem value="true">Yes</MenuItem>
+          <MenuItem value="false">No</MenuItem>
+        </TextField>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button variant="contained" onClick={handleSubmit}>
+          {initialData ? "Update" : "Create"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}

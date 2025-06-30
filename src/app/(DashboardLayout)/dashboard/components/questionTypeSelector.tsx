@@ -22,6 +22,7 @@ type FilterCombo = {
   course: string;
   level: string;
   subject: string;
+  chapter:string;
 };
 
 type SubjectChapter = {
@@ -113,12 +114,23 @@ export default function QuestionTypeSelector({
   useEffect(() => {
     if (!subject||!course||!level) return;
     const fetchChapters = async () => {
+      if(isNew){
+         const filtered = allData.filter((d) => d.course === course && d.level === level && d.subject===subject);
+        setChapters(Array.from(new Set(filtered.map((d) => d.chapter))))
+      }
+      else{
     const res = await fetch(`/api/Fetch-SubjectWithChapters?course=${course}&level=${level}&subject=${subject}`);
 
       if (!res.ok) return;
       const json = await res.json();
     if (json.success) {
+      console.log("f",json.data)
   setChapters(json.data);
+  
+}
+ const filtered = allData.filter((d) => d.course === course && d.level === level && d.subject===subject);
+ console.log("s",Array.from(new Set(filtered.map((d) => d.chapter))),filtered,allData)
+        setChapters(Array.from(new Set(filtered.map((d) => d.chapter))))
 }
     };
     fetchChapters();
