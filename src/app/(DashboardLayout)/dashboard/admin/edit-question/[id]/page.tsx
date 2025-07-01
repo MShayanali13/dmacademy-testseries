@@ -198,8 +198,8 @@ noStore()
   }
 
   return (
-    <Box mt={4} p={4}>
-      <Typography variant="h6" mb={4}>
+    <Box mt={0} p={2}>
+      <Typography variant="h4" mb={4}>
         Edit Question
       </Typography>
       <Grid container spacing={2}>

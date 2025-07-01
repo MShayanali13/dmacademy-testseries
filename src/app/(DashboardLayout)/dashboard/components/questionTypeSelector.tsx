@@ -22,7 +22,7 @@ type FilterCombo = {
   course: string;
   level: string;
   subject: string;
-  chapter:string;
+  chapter: string;
 };
 
 type SubjectChapter = {
@@ -45,8 +45,8 @@ export default function QuestionTypeSelector({
 }: QuestionTypeSelectorProps) {
   const [course, setCourse] = useState("");
   const [level, setLevel] = useState("");
-  const [subject, setSubject] = useState("");
-  const [chapter, setChapter] = useState("");
+  const [subject, setSubject] = useState(initialSubject?initialSubject:"");
+  const [chapter, setChapter] = useState(initialChapter?initialChapter:"");
 
   const [allData, setAllData] = useState<FilterCombo[]>([]);
   const [chapters, setChapters] = useState<string[]>([]);
@@ -57,21 +57,23 @@ export default function QuestionTypeSelector({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+   
     if (initialCourse) setCourse(initialCourse);
     if (initialLevel) setLevel(initialLevel);
-    if (initialSubject) setSubject(initialSubject);
-    if (initialChapter) setChapter(initialChapter);
+    // if (initialSubject) setSubject(initialSubject);
+    // if (initialChapter) setChapter(initialChapter);
   }, [initialCourse, initialLevel, initialSubject, initialChapter]);
 
   useEffect(() => {
     if (isSubmitted) {
       setCourse("");
-      setLevel("");
+       setLevel("Easy")
       setSubject("");
       setChapter("");
       setChapters([]);
     }
   }, [isSubmitted]);
+  
 
   useEffect(() => {
     const fetchFilters = async () => {
@@ -81,60 +83,76 @@ export default function QuestionTypeSelector({
       if (json.success) {
         setAllData(json.data);
         setCourses(Array.from(new Set(json.data.map((d: FilterCombo) => d.course))));
+        setLevel("Easy")
       }
       setLoading(false);
     };
     fetchFilters();
   }, []);
 
-  useEffect(() => {
-    if (!course) {
-      setLevels([]);
-      setLevel("");
-      setSubjects([]);
-      setSubject("");
-      return;
-    }
-    const filtered = allData.filter((d) => d.course === course);
-    setLevels(Array.from(new Set(filtered.map((d) => d.level))));
-    setLevel("");
-    setSubjects([]);
-    setSubject("");
-    setChapters([]);
-  }, [course]);
+  // useEffect(() => {
+  //   if (!course) {
+  //     setLevels([]);
+  //      setLevel("Easy")
+  //     setSubjects([]);
+  //     setSubject("");
+  //     return;
+  //   }
+  //   const filtered = allData.filter((d) => d.course === course);
+  //   setLevels(Array.from(new Set(filtered.map((d) => d.level))));
+  //    setLevel("Easy")
+  //   setSubjects([]);
+  //   setSubject("");
+  //   setChapters([]);
+  // }, [course]);
 
-  useEffect(() => {
-    if (!course || !level) return;
-    const filtered = allData.filter((d) => d.course === course && d.level === level);
-    setSubjects(Array.from(new Set(filtered.map((d) => d.subject))));
-    setSubject("");
-    setChapters([]);
-  }, [level]);
+  // useEffect(() => {
+  //    if (!course ) return;
+  //   const filtered = allData.filter((d) => d.course === course );
+  //   setSubjects(Array.from(new Set(filtered.map((d) => d.subject))));
+   
+  //   setChapters([]);
+  // }, [course]);
 
-  useEffect(() => {
-    if (!subject||!course||!level) return;
-    const fetchChapters = async () => {
-      if(isNew){
-         const filtered = allData.filter((d) => d.course === course && d.level === level && d.subject===subject);
-        setChapters(Array.from(new Set(filtered.map((d) => d.chapter))))
-      }
-      else{
-    const res = await fetch(`/api/Fetch-SubjectWithChapters?course=${course}&level=${level}&subject=${subject}`);
+useEffect(() => {
+  if (!course) return;
 
-      if (!res.ok) return;
-      const json = await res.json();
-    if (json.success) {
-      console.log("f",json.data)
-  setChapters(json.data);
-  
-}
- const filtered = allData.filter((d) => d.course === course && d.level === level && d.subject===subject);
- console.log("s",Array.from(new Set(filtered.map((d) => d.chapter))),filtered,allData)
-        setChapters(Array.from(new Set(filtered.map((d) => d.chapter))))
-}
-    };
-    fetchChapters();
-  }, [subject]);
+  const filtered = allData.filter((d) => d.course === course);
+  const uniqueSubjects = Array.from(new Set(filtered.map((d) => d.subject)));
+  setSubjects(uniqueSubjects);
+
+  if (initialSubject && uniqueSubjects.includes(initialSubject)) {
+    setSubject(initialSubject);
+    onSubjectChange(initialSubject);
+  }
+}, [course, allData]);
+
+
+  // useEffect(() => {
+  //   if (!subject || !course ) return;
+  //   const fetchChapters = async () => {
+     
+     
+  //       const filtered = allData.filter((d) => d.course === course&& d.subject === subject);
+  //       setChapters(Array.from(new Set(filtered.map((d) => d.chapter))))
+    
+  //   };
+  //   fetchChapters();
+
+  // }, [subject]);
+  useEffect(() => {
+  if (!subject || !course) return;
+
+  const filtered = allData.filter((d) => d.course === course && d.subject === subject);
+  const uniqueChapters = Array.from(new Set(filtered.map((d) => d.chapter)));
+  setChapters(uniqueChapters);
+
+  if (initialChapter && uniqueChapters.includes(initialChapter)) {
+    setChapter(initialChapter);
+    onChapterChange(initialChapter);
+  }
+}, [subject, allData]);
+
 
   const handleCourseChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const val = e.target.value as string;
@@ -180,7 +198,7 @@ export default function QuestionTypeSelector({
           </TextField>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        {/* <Grid item xs={12} sm={4}>
           <TextField
             label="Level"
             select
@@ -195,7 +213,7 @@ export default function QuestionTypeSelector({
               </MenuItem>
             ))}
           </TextField>
-        </Grid>
+        </Grid> */}
 
         <Grid item xs={12} sm={4}>
           <TextField
@@ -203,8 +221,9 @@ export default function QuestionTypeSelector({
             select
             fullWidth
             value={subject}
+            defaultValue={initialSubject}
             onChange={handleSubjectChange}
-            disabled={!level}
+            disabled={!course}
           >
             {subjects.map((s) => (
               <MenuItem key={s} value={s}>
@@ -220,6 +239,7 @@ export default function QuestionTypeSelector({
             select
             fullWidth
             value={chapter}
+            defaultValue={initialChapter}
             onChange={handleChapterChange}
             disabled={!subject}
           >

@@ -72,12 +72,6 @@ export async function GET(req: NextRequest) {
       
       const chapter=Array.from(new Set(data.map((q) => q.course)));
 
-console.log(data, {
-          course,
-          level,
-          subject,
-          chapter
-        })
       return NextResponse.json({
         success: true,
         data,

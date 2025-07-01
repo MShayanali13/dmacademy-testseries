@@ -10,7 +10,7 @@ const SelectTest = () => {
 
       const [isSubmitted, setIsSubmitted] = useState(false);
 const [loading, setLoading] = useState(true);
-        const [level, setLevel] = useState<string>('');
+        const [level, setLevel] = useState<string>('Easy');
         
         const [course, setCourse] = useState<string>('');
         const [subject, setSubject] = useState<string>('');
@@ -47,8 +47,7 @@ const [loading, setLoading] = useState(true);
           // })
           //   .then((response) => response.json())
           //   .then((data) => {
-          //     console.log('Test generated:', data);
-              setIsSubmitted(true);
+             setIsSubmitted(true);
               window.location.href = '/dashboard/student/test?level=' + level + '&subject=' + subject + '&chapter=' + chapter+"&course="+course;
             // })
             // .catch((error) => {

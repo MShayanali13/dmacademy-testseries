@@ -120,7 +120,7 @@ export default function ManageQuestionBank() {
   }, []);
 
  const filteredQuestions = questions.filter((q) => {
-  // console.log(q)
+
   const subjectMatch = subject ? q.subject?.toLowerCase().includes(subject.toLowerCase()) : true;
   const chapterMatch = chapter ? q.chapter?.toLowerCase().includes(chapter.toLowerCase()) : true;
   const levelMatch = level ? q.level?.toLowerCase().includes(level.toLowerCase()) : true;
@@ -503,7 +503,10 @@ if(isLoading){
       }}
     />
   </TableCell>
-  {["Subject", "Chapter", "Level", "Question", "Options", "Answer","Hint","Course", "Actions"].map((header) => (
+  {/* removed level */}
+  {["Subject", "Chapter", 
+  
+   "Question", "Options", "Answer","Hint","Course", "Actions"].map((header) => (
     <TableCell
       key={header}
       sx={{
@@ -551,7 +554,7 @@ if(isLoading){
 
           <TableCell >{q.subject}</TableCell>
           <TableCell >{q.chapter}</TableCell>
-          <TableCell >
+          {/* <TableCell >
             <Chip
               label={q.level}
               size="small"
@@ -571,7 +574,7 @@ if(isLoading){
                     : "#f3704d",
               }}
             />
-          </TableCell>
+          </TableCell> */}
           <TableCell >
             {q.questionType === "image" ? (
               <img
@@ -620,11 +623,11 @@ if(isLoading){
             {q.hintType === "image" ? (
               <img
                 src={q.hint?.imgUrl || ""}
-                alt="question"
+                alt="Hint Not Rendering"
                 style={{ maxWidth: 195, height: "auto", borderRadius: 4 }}
               />
             ) : (
-              <p style={{ wordBreak: "break-word" }}>{q.hint?.text}</p>
+              <p style={{ wordBreak: "break-word" }}>{q.hint?.text||"-"}</p>
             )}
           </TableCell>
            <TableCell >{q.course}</TableCell>

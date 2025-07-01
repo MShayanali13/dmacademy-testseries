@@ -20,7 +20,7 @@ export default function Home() {
   const router=useRouter()
   const [isLoading,setIsLoading]=useState(true)
  const {isSignedIn,isLoaded}=useUser()
- console.log(isLoaded)
+
 useEffect(() => {
   if (!isLoaded) return; // Wait until Clerk has finished loading
  

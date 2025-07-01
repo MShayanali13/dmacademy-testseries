@@ -142,15 +142,16 @@ if(loading) {
    
     <Box p={2} > 
     {/* Download Button */}
-      <Box mb={-5} display="flex" justifyContent="flex-end">
+      <Box mb={1} display="flex" flexWrap={"wrap"} justifyContent="space-between">
         <Button variant="outlined" onClick={handleDownload}>
           Download PDF
         </Button>
+        <Typography variant="h4" mt={1} gutterBottom>
+        Result Summary
+      </Typography>
       </Box>
       <Box id="result-pdf" sx={{mt:0,}}>
-      <Typography variant="h4" gutterBottom>
-        Test Result Summary
-      </Typography>
+      
 
       {/* Summary Boxes */}
       <Grid container spacing={2} mb={4} mt={2}>

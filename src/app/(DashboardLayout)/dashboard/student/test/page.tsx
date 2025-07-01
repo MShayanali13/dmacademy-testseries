@@ -184,8 +184,7 @@ const handleSubmit = async () => {
     });
 
     const result = await response.json();
-    console.log("Result:", result);
-
+   
     // Optional: Save result to state or redirect to result page
     alert(
       `Correct: ${result.correct}\nIncorrect: ${result.incorrect}\nUnanswered: ${result.unanswered.length}\nScore: ${result.score}\nPercentage: ${result.percentage}%`

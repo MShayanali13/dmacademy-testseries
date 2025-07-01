@@ -36,6 +36,11 @@ const QuestionBankSchema = new mongoose.Schema({
     enum: ['Easy', 'Medium', 'Difficult'],
     required: true,
   },
+  level_old: {
+    type: String,
+    enum: ['Easy', 'Medium', 'Difficult'],
+    required: true,
+  },
   course: {
     type: String,
     

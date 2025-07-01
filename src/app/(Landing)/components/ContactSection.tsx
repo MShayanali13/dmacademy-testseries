@@ -56,7 +56,6 @@ export default function ContactSection() {
   function onSubmit(data: ContactFormValues) {
     setIsSubmitting(true);
     setTimeout(() => {
-      console.log("Form submitted:", data);
       reset();
       setFormSubmitted(true);
       setIsSubmitting(false);
