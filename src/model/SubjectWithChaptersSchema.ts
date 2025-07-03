@@ -2,7 +2,10 @@
 import mongoose from "mongoose";
 
 const SubjectWithChapters = new mongoose.Schema({
- 
+ course:{
+type:String,
+required:true,
+ },
   subject: {
     type: String,
     required: true,

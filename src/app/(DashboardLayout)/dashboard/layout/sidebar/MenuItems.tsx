@@ -47,7 +47,19 @@ const AdminMenuitems = [
     icon: IconAperture,
     href: "/dashboard/admin/manage-users",
   },
+  // { 
+  //   id:uniqueId(),
+  //   title:"Manage Chapters",
+  //   icon:IconAperture,
+  //   herf:"/dashboard/admin/manage-subjectWithChapter"
+  // },
   {
+    id: uniqueId(),
+    title: "Manage Chapters",
+    icon: IconAperture,
+    href: "/dashboard/admin/manage-subjectWithChapter",
+  },
+   {
     id: uniqueId(),
     title: "Manage Question Bank",
     icon: IconAperture,
