@@ -1,5 +1,8 @@
 "use client";
 
+export const dynamic = 'force-dynamic'
+
+
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -24,6 +27,8 @@ import QuestionTypeSelector from "../../components/questionTypeSelector";
 
 import * as XLSX from "xlsx";
 
+import { unstable_noStore as noStore } from "next/cache";
+
 interface SubjectChapterType {
   _id?: string;
   course: string;
@@ -32,6 +37,9 @@ interface SubjectChapterType {
 }
 
 export default function ManageSubjectWithChapters() {
+
+    noStore()
+
   const [data, setData] = useState<SubjectChapterType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -61,6 +69,11 @@ export default function ManageSubjectWithChapters() {
   const handleSubmit = async () => {
     const url = editingId ? `/api/Edit-SubjectWithChapter/${editingId}` : "/api/Set-SubjectWithChapters";
     const method = editingId ? "PUT" : "POST";
+
+ if (!course || !subject || !chapter) {
+    alert("Please fill all fields before submitting.");
+    return;
+  }
 
     const res = await fetch(url, {
       method,
@@ -132,7 +145,7 @@ export default function ManageSubjectWithChapters() {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
      const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-console.log("Parsed Excel Data:", jsonData);
+
 
 
       // Call your API to save subjectWithChapter
@@ -186,108 +199,6 @@ console.log("Parsed Excel Data:", jsonData);
       <Box mb={3}>
         <Typography variant="h4" mb={4}>Subject & Chapter</Typography>
 
-
-        {/* <Grid container spacing={2}>
-
-          <Grid item xs={12} sm={12} flexDirection="column">
-            <QuestionTypeSelector
-              onLevelChange={handleLevelChange}
-              onCourseChange={handleCourseChange}
-              onSubjectChange={handleSubjectChange}
-              onChapterChange={handleChapterChange}
-              new
-              title={null}
-              isSubmitted={isSubmitted}
-            />
-             <Grid item xs={12} sm={12} flexDirection="column">
-         
-            <Box sx={{ mt: 2 }}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => {
-                  setLevel("");
-                  setCourse("")
-                  setSubject("");
-                  setChapter("");
-                  setIsSubmitted(true);
-                }}
-                sx={{
-                  paddingY: "0px",
-                  paddingX: "8px",
-                  marginTop: "0px",
-                  borderColor: "#1976d2",
-                  color: "#1976d2",
-                  "&:hover": {
-                    backgroundColor: "#e3f2fd",
-                    borderColor: "#1565c0",
-                  },
-                }}
-                disabled={!course && !subject && !chapter}
-              >
-                <IconButton
-                  sx={{
-                    marginRight: 0,
-                    paddingLeft: 0,
-                    color: "#d32f2f",
-                    "&:hover": {
-                      color: "#b71c1c",
-                    },
-                  }}
-                >
-                  <Cancel />
-                </IconButton>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: "#d32f2f",
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 600,
-                  }}
-                >
-                  Clear Filters
-                </Typography>
-              </Button>
-              <Button sx={{ ml: 2 }} variant="contained" onClick={() => setOpen(true)}>Add New</Button>
-</Box>
- <Box sx={{ mt: 2 }}>
-              <Button
-                variant="contained"
-                component="label"
-                sx={{ marginLeft: "15px" }}
-              >
-                Import Chapters
-                <input
-                  type="file"
-                  accept=".xlsx, .xls"
-                  hidden
-                  onChange={handleExcelUpload}
-                />
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleDownloadExcel}
-                sx={{ marginLeft: "15px" }}
-              >
-                Export Chapters
-              </Button>
-
-              {selected.length > 0 && (
-                <Button
-                  variant="contained"
-                  color="error"
-                  sx={{ ml: 2 }}
-                  onClick={handleBulkDelete}
-                >
-                  Delete Selected ({selected.length})
-                </Button>
-              )}
-            </Box>
-          </Grid>
-          </Grid>
-
-        </Grid> */}
 
      <Grid container spacing={2} sx={{ mt: 2 }}>
   {/* Question Type Selector - Full Width */}

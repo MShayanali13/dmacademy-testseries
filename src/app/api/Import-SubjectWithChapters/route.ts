@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
+// console.log(data)
     const formattedSubjectWithChapter = data.subjectWithChapter.map((q: any) => {
       
       return {
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
        
       };
     });
-
+// console.log(formattedSubjectWithChapter)
 
     // Insert many at once
     await QuestionStructure.insertMany(formattedSubjectWithChapter);

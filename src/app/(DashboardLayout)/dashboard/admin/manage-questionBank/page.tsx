@@ -314,6 +314,8 @@ if(isLoading){
               }}
               sx={{
                 marginTop: "20px",
+                paddingX:"10px",
+                paddingY:"0px",
                 borderColor: "#1976d2",
                 color: "#1976d2",
                 "&:hover": {
@@ -321,11 +323,12 @@ if(isLoading){
                   borderColor: "#1565c0",
                 },
               }}
-              disabled={!level && !subject && !chapter}
+              disabled={!course && !subject && !chapter}
             >
               <IconButton
                 sx={{
                   marginRight: 0.5,
+                  paddingLeft:0,
                   color: "#d32f2f",
                   "&:hover": {
                     color: "#b71c1c",

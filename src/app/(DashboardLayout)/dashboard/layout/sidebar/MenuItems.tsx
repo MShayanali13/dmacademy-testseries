@@ -67,6 +67,12 @@ const AdminMenuitems = [
   },
   {
     id: uniqueId(),
+    title: "Generate Question Paper",
+    icon: IconAperture,
+    href: "/dashboard/admin/generate-question-paper",
+  },
+  {
+    id: uniqueId(),
     title: "Set Question Bank",
     icon: IconUserPlus,
     href: "/dashboard/admin/set-question-bank",
