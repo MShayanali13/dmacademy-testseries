@@ -13,7 +13,7 @@ export default function SetTest() {
 
   const [loading, setLoading] = useState(true);
     const [isSubmitted, setIsSubmitted] = useState(false);
-  const [questionCount, setQuestionCount] = useState(20);
+  const [questionCount, setQuestionCount] = useState(5);
   const [questions, setQuestions] = useState<Record<number, QuestionData>>({});
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function SetTest() {
     }));
   };
 
-  const [level, setLevel] = useState<string>('');
+  const [level, setLevel] = useState<string>('Easy');
   
   const [course, setCourse] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
