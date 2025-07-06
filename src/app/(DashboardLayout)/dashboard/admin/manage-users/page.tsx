@@ -132,7 +132,7 @@ const handleUserSubmit = async (formData: Partial<UserData>) => {
       const updated = await response.json();
       setUsers((prev) => {
         if (isEdit) {
-          return prev.map((u) => (u._id === updated.user._id ? updated.user : u));
+          return prev.map((u) => (u._id === updated.user?._id ? updated.user : u));
         } else {
           return [...prev, updated.user];
         }

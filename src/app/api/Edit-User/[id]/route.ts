@@ -6,7 +6,7 @@ import QuestionBankSchema from "@/model/QuestionBankSchema";
 import { unstable_noStore as noStore } from 'next/cache';
 import UserSchema from "@/model/UserSchema";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     noStore();
     await connectDB();

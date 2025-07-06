@@ -8,6 +8,7 @@ import Loading from "../../loading";
 
 import { unstable_noStore as noStore } from 'next/cache';
 import PageContainer from "../../components/container/PageContainer";
+import { object } from "zod";
 
 export default function TestPage() {
   // const [timeLeft, setTimeLeft] = useState(60 * 30); // 30 minutes timer (example)
@@ -237,7 +238,7 @@ useEffect(() => {
     }
 
   return (
-      <PageContainer title="Test" description="this is test page">
+      <PageContainer title="Test" description="this is test page" >
         
         <Typography variant="h4" sx={{mt:"70px",display: { xs: "block", md: "none" }}} gutterBottom>
             Test
@@ -255,20 +256,25 @@ useEffect(() => {
               position: "fixed",
               top: 80,
               width: "90vw",
-              marginLeft:"16px",
+              // marginLeft:"16px",
               alignSelf: "center",
               zIndex: 10,
-              justifyContent:"center",
+              justifyContent:"space-between",
               backgroundColor: "#fb9a09",
               borderRadius: 2,
               color: "white",
+justifySelf:"anchor-center",
               p: 1.5,
               textAlign: "center",
               display: { xs: "flex", md: "none" },
             }}
           >
-            <Typography variant="h5" fontWeight="bold">
+          
+            <Typography variant="h6" fontWeight="bold">
               Time Left: {formatTime(timeLeft)}
+            </Typography>
+              <Typography variant="h6" fontWeight="bold">
+              Ques. Left: {questions.length - Object.keys(selectedOptions).length}
             </Typography>
           </Box>
           
@@ -322,13 +328,22 @@ useEffect(() => {
                   borderRadius: 2,
                   textAlign: "center",
                   color: "white",
-                  
+                  justifyContent:"space-between",
+                  display:"flex"
                 }}
               >
-                <Typography variant="h6">Time Left</Typography>
+                <Box>
+                  <Typography variant="h6">Time Left</Typography>
                 <Typography variant="h5" fontWeight="bold">
                   {formatTime(timeLeft)}
                 </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="h6">Ques. Left</Typography>
+                <Typography variant="h5" fontWeight="bold">
+                  {questions.length-Object.keys(selectedOptions).length}
+                </Typography>
+                </Box>
               </Box>
 
               <Box
@@ -411,7 +426,7 @@ useEffect(() => {
               </Button>
             </Grid><Box
               sx={{
-                ml: 2,
+                ml: 6,
                 pb: 5,
                 width:"100%",
                 
