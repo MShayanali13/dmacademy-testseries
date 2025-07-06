@@ -1,6 +1,6 @@
 "use client";
 import { Box, Grid, Button, Typography } from "@mui/material";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import QuestionCard from "../../components/questionCard";
 import { Question } from "@/types/questionType";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,9 @@ export default function TestPage() {
   // const [timeLeft, setTimeLeft] = useState(60 * 30); // 30 minutes timer (example)
 
   noStore()
+
+  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeQuestion, setActiveQuestion] = useState<number>(0);
 
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -148,12 +151,12 @@ useEffect(() => {
   generateTest();
 },[])
 
-  const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
 
 
 
-  const handleSelectOption = (questionIndex: number, optionIndex: number) => {
-    setSelectedOptions((prev) => ({ ...prev, [questionIndex]: optionIndex }));
+  const handleSelectOption = (questionID: string, optionIndex: number) => {
+    setSelectedOptions((prev) => ({ ...prev, [questionID]: optionIndex }));
   };
 
   const Router=useRouter();
@@ -161,17 +164,19 @@ useEffect(() => {
 
 const handleSubmit = async () => {
   try {
-    const submittedAnswers: Record<number, string> = {};
+    const submittedAnswers: Record<string, string> = {};
 
-    Object.entries(selectedOptions).forEach(([qIndex, optIndex]) => {
-      const question = questions[+qIndex];
+    Object.entries(selectedOptions).forEach(([qID, optIndex]) => {
+      const question = questions.find(q => q._id === qID);
+
       if (!question) return;
 
       // Convert 0-based option index to A/B/C/D
       const optionLetter = String.fromCharCode(65 + +optIndex);
-      submittedAnswers[+qIndex] = optionLetter;
+      submittedAnswers[qID] = optionLetter;
     });
-
+console.log('ANS',submittedAnswers)
+console.log("OPT",selectedOptions)
     const response = await fetch("/api/Submit-Test", {
       method: "POST",
       headers: {
@@ -199,6 +204,32 @@ const handleSubmit = async () => {
   }
 };
   
+
+
+useEffect(() => {
+  const handleScroll = () => {
+    const centerY = window.innerHeight / 2;
+    let closestIdx = 0;
+    let closestDist = Infinity;
+    questionRefs.current.forEach((el, idx) => {
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const elCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(elCenter - centerY);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIdx = idx;
+        }
+      }
+    });
+    setActiveQuestion(closestIdx);
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  return () => window.removeEventListener("scroll", handleScroll);
+}, [questions.length]);
+
+
     if (loading) {
       return (
       <Loading />
@@ -214,7 +245,7 @@ const handleSubmit = async () => {
              <Typography variant="h4" sx={{mt:"20px",display: { xs: "none", md: "block" }}} gutterBottom>
             Test
           </Typography>
-    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)",justifyContent:"center",paddingLeft:"0px", maxWidth:"100vw" }}>
+    <Grid container spacing={5} gap={5} className="justify-center md:justify-start" sx={{ height: "calc(100vh - 100px)",paddingLeft:"0px", maxWidth:"100vw" }}>
      
       {
         questions.length!==0?(
@@ -245,6 +276,7 @@ const handleSubmit = async () => {
             item
             xs={12}
             md={8}
+            
             sx={{
               minHeight: "100vh",
               pr: { md: 2 },
@@ -252,12 +284,17 @@ const handleSubmit = async () => {
             }}
           >
               {questions.map((q, index) => (
-                <QuestionCard
+                <div
+                  key={q._id}
+                  ref={el => questionRefs.current[index] = el}
+                >
+               <QuestionCard
                   key={index}
                   index={index}
                   data={q}
-                  selectedOption={selectedOptions[index] ?? null}
-                  onSelect={(optionIdx) => handleSelectOption(index, optionIdx)} />
+                  selectedOption={selectedOptions[q._id] ?? null}
+                  onSelect={(optionIdx) => handleSelectOption(q._id, optionIdx)} />
+                  </div>
               ))}
 
             </Grid><Grid
@@ -268,10 +305,14 @@ const handleSubmit = async () => {
                 display: { xs: "none", md: "flex" },
                 flexDirection: "column",
                 gap: 1,
-                position: "-webkit-sticky",
-                right: "100px",
-                top: "80px",
-                height: "fit-content",
+                position: "fixed", // <-- use sticky, not -webkit-sticky
+    top: "40px",
+    width:"-webkit-fill-available",
+    right:"66px",
+    paddingRight:"24px",
+           // <-- stick 80px from the top (adjust as needed)
+    height: "-webkit-fill-available",
+    justifyContent: "center", // <-- ensures sticky works inside flex/grid
               }}
             >
               <Box
@@ -301,7 +342,7 @@ const handleSubmit = async () => {
                 }}
               >
              
-                {questions.map((_, index) => (
+                {/* {questions.map((_, index) => (
   <Button
     key={index}
     variant={selectedOptions[index] !== undefined ? "contained" : "outlined"}
@@ -315,12 +356,58 @@ const handleSubmit = async () => {
   >
     {index + 1}
   </Button>
+))} */}
+{questions.map((q, index) => (
+  <Button
+    key={q._id}
+    variant={ "outlined" }
+    size="small"
+    sx={{
+      minWidth: "32px",
+      padding: "2px",
+      ":hover":{
+ backgroundColor:
+        selectedOptions[q._id] !== undefined
+          ? "#4caf50" // green if answered
+          : activeQuestion === index
+          ? "#1976d2" // blue if active and not answered
+          : "white",
+      color:
+        selectedOptions[q._id] !== undefined
+          ? "white"
+          : activeQuestion === index
+          ? "white"
+          : "black",
+      },
+     backgroundColor:
+        selectedOptions[q._id] !== undefined
+          ? "#4caf50" // green if answered
+          : activeQuestion === index
+          ? "#1976d2" // blue if active and not answered
+          : "white",
+      color:
+        selectedOptions[q._id] !== undefined
+          ? "white"
+          : activeQuestion === index
+          ? "white"
+          : "black",
+    }}
+     onClick={() => {
+  const el = questionRefs.current[index];
+  if (el) {
+    setActiveQuestion(index); // Set active immediately
+    const y = el.getBoundingClientRect().top + window.scrollY - 150; // 80px offset from top
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
+}}
+  >
+    {index + 1}
+  </Button>
 ))}
-
               </Box>
 
               <Button variant="contained" onClick={handleSubmit}  color="error" size="large">
-                Submit Test as
+                Submit Test
               </Button>
             </Grid><Box
               sx={{

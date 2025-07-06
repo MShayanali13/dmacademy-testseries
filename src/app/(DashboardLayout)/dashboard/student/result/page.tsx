@@ -25,6 +25,9 @@ export default function ResultPage() {
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [submittedAnswers, setSubmittedAnswers] = useState<string[]>([]);
+  
+  const [answers, setAnswers] = useState<{id:string;ans:string;selected:string;}[]>([]);
+  
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [incorrectCount, setIncorrectCount] = useState(0);
@@ -74,6 +77,10 @@ export default function ResultPage() {
     const { result, questions, submittedAnswers } = parsed;
 
     setQuestions(questions || []);
+
+
+    setAnswers(result.Answers || []);
+    
     setSubmittedAnswers(
       Object.values(submittedAnswers || {}) as string[]
     );
@@ -81,7 +88,10 @@ export default function ResultPage() {
     setCorrectCount(result?.correct || 0);
     setIncorrectCount(result?.incorrect || 0);
     setUnansweredCount(result?.unanswered?.length || 0);
+    
     setScore(result?.score || 0);
+
+
     setPercentage(result?.percentage?.toFixed?.(2) || "0.00");
 
     setLoading(false);
@@ -195,9 +205,10 @@ if(loading) {
           </TableHead>
           <TableBody>
             {questions.map((q, i) => {
-              const selected = submittedAnswers[i];
+              const answerObj = answers.find(a => a.id === q._id);
+              const selected = answerObj;
               const result =
-                !selected ? "Skipped" : selected === q.answer ? "Correct" : "Incorrect";
+                !selected?.ans ? "Skipped" : selected?.ans === "correct" ? "Correct" : "Incorrect";
               const color =
                 result === "Correct"
                   ? "green"
@@ -214,7 +225,7 @@ if(loading) {
                   (<TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}><Box component="img" src={q.question.imgUrl} alt="question" crossOrigin="anonymous"  sx={{ maxWidth: '100%', maxHeight: 150, objectFit: 'contain' }} />
 </TableCell>)
                   }
-                  <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{selected || "—"}</TableCell>
+                  <TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{selected?.selected|| "—"}</TableCell>
                   
                   {q.hintType=="text"?
                   (<TableCell sx={{ border: "0.7px solid #888", py: 1.5, px: 2  }}>{q.hint.text||"—"}</TableCell>):

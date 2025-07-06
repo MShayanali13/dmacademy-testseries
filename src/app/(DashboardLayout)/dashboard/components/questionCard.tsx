@@ -14,7 +14,9 @@ interface Props {
 export default function QuestionCard({index, data, selectedOption, onSelect }: Props) {
   return (
     <Box
+    
       sx={{
+            width:"-webkit-fill-available",
         mb: 3,
         p: 3,
         border: "1px solid #ddd",

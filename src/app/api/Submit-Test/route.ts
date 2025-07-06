@@ -3,7 +3,7 @@ import { Question } from "@/types/questionType";
 
 import { unstable_noStore as noStore } from 'next/cache';
 
-type SubmittedAnswers = Record<number, string>;
+type SubmittedAnswers = Record<string, string>;
 
 export async function POST(req: Request) {
   noStore();
@@ -17,19 +17,24 @@ export async function POST(req: Request) {
 
     let correct = 0;
     let incorrect = 0;
-    const unanswered: number[] = [];
+    
+    const Answers: { id: string; ans: string;selected:string; }[]= [];
+    
+    const unanswered: string[] = [];
 
     const totalQuestions = generatedQuestions.length;
 
     generatedQuestions.forEach((question, index) => {
-      const selected = submittedAnswers[index];
+      const selected = submittedAnswers[question._id];
 
       if (!selected) {
-        unanswered.push(index);
+        unanswered.push(question._id);
       } else if (selected === question.answer) {
         correct++;
+        Answers.push({id:question._id,ans:"correct",selected})
       } else {
         incorrect++;
+        Answers.push({id:question._id,ans:"incorrect",selected})
       }
     });
 
@@ -40,6 +45,7 @@ export async function POST(req: Request) {
       correct,
       incorrect,
       unanswered,
+      Answers,
       score,
       percentage,
     });
