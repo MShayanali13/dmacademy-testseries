@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     // Insert many at once
     await QuestionBank.insertMany(formattedQuestions);
 
-    return NextResponse.json({ message: "Questions imported successfully" });
+    return NextResponse.json({ message: "Questions imported successfully",ok:true });
   } catch (error: any) {
     console.error("Bulk import error:", error);
     return NextResponse.json(

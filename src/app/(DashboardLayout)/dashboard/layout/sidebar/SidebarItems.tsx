@@ -56,15 +56,15 @@ const [isLoading,setIsLoading]=useState(true)
   return (
     <Box sx={{ px: 3 ,borderTop:"1px solid #dcdcdc"}}>
       <List sx={{ pt: 3, }} className="sidebarNav" component="div">
-        {menuItems.map((item) => {
+        {menuItems.map((item,i) => {
           if (item.subheader) {
-            return <NavGroup item={item} key={item.id} />;
+            return <NavGroup item={item} key={i} />;
           }
 
           return (
             <NavItem
               item={item}
-              key={item.id}
+              key={i}
               pathDirect={pathDirect}
               onClick={toggleMobileSidebar}
             />

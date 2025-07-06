@@ -186,7 +186,7 @@ const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-
+console.log(jsonData)
     // Call your API to save questions
     const res = await fetch("/api/Import-Questions", {
       method: "POST",
