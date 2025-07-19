@@ -102,6 +102,7 @@ if(isLoading){
           sx={{
             paddingTop: "20px",
             maxWidth: "100vw",
+            overflowX:"hidden"
           }}
         >
           {/* ------------------------------------------- */}

@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     });
 
     const score = correct * 4 - incorrect * 1;
-    const percentage = Math.round((correct / totalQuestions) * 100);
+    const percentage = Math.round((score / totalQuestions) * 100);
 
     return NextResponse.json({
       correct,

@@ -246,7 +246,7 @@ useEffect(() => {
              <Typography variant="h4" sx={{mt:"20px",display: { xs: "none", md: "block" }}} gutterBottom>
             Test
           </Typography>
-    <Grid container spacing={5} gap={5} className="justify-center md:justify-start" sx={{ height: "calc(100vh - 100px)",paddingLeft:"0px", maxWidth:"100vw" }}>
+    <Grid container spacing={5} gap={5} className="justify-center md:justify-start" sx={{ height: "calc(100vh - 80px)",paddingLeft:"0px", maxWidth:"100vw" }}>
      
       {
         questions.length!==0?(
@@ -312,12 +312,14 @@ justifySelf:"anchor-center",
                 flexDirection: "column",
                 gap: 1,
                 position: "fixed", // <-- use sticky, not -webkit-sticky
-    top: "40px",
+    top: "70px",
     width:"-webkit-fill-available",
     right:"66px",
     paddingRight:"24px",
            // <-- stick 80px from the top (adjust as needed)
-    height: "-webkit-fill-available",
+    // height:"400px",
+    // maxHeight: "calc(100vh - 80px)", // ✅ Adjusted to screen
+    overflowY: "auto", // ✅ Enables scrolling if needed
     justifyContent: "center", // <-- ensures sticky works inside flex/grid
               }}
             >
@@ -329,18 +331,19 @@ justifySelf:"anchor-center",
                   textAlign: "center",
                   color: "white",
                   justifyContent:"space-between",
-                  display:"flex"
+                  display:"flex",
+                  marginTop:0
                 }}
               >
-                <Box>
-                  <Typography variant="h6">Time Left</Typography>
-                <Typography variant="h5" fontWeight="bold">
+                <Box sx={{display:"flex"}}>
+                  <Typography variant="h6">Time Left:  </Typography>
+                <Typography variant="h6" ml="5px" fontWeight="bold">
                   {formatTime(timeLeft)}
                 </Typography>
                 </Box>
-                <Box>
-                  <Typography variant="h6">Ques. Left</Typography>
-                <Typography variant="h5" fontWeight="bold">
+                <Box sx={{display:"flex"}}>
+                  <Typography variant="h6">Ques. Left:  </Typography>
+                <Typography variant="h6" ml="5px" fontWeight="bold">
                   {questions.length-Object.keys(selectedOptions).length}
                 </Typography>
                 </Box>
@@ -350,9 +353,9 @@ justifySelf:"anchor-center",
                 sx={{
                   display: "grid",
                   gridTemplateColumns: "repeat(5, 1fr)",
-                  gap: 1,
+                  gap: 0.5,
                   backgroundColor: "#f1f1f1",
-                  p: 2,
+                  p: 1.5,
                   borderRadius: 2,
                 }}
               >

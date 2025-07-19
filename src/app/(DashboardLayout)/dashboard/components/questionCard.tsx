@@ -34,7 +34,7 @@ export default function QuestionCard({index, data, selectedOption, onSelect }: P
     {data.question.text}
   </Typography>
 ) : (
-  <Box mb={2}>
+  <Box mb={2} alignItems={"center"}>
     <Image
       src={data.question.imgUrl || ""}
       alt={`Question ${index + 1}`}

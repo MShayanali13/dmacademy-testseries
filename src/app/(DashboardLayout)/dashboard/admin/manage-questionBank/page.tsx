@@ -418,7 +418,6 @@ if(isLoading){
   elevation={1}
   sx={{
     maxHeight: 500,
-    borderRadius: 3,
     overflow: "auto",
   }}
 >

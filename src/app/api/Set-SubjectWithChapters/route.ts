@@ -7,6 +7,12 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { course, subject, chapter } = body;
 
+  const existing=await QuestionStructureSchema.find({course,subject,chapter})
+   if(existing){
+    
+  return NextResponse.json({ success: true, message:"already found" });
+   }
+
   const created = await QuestionStructureSchema.create({ course, subject, chapter,level:"Easy",level_old:"" });
   return NextResponse.json({ success: true, created });
 }
