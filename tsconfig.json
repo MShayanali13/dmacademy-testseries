@@ -26,6 +26,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(DashboardLayout)/dashboard/admin/select-question-bank/test"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(DashboardLayout)/dashboard/admin/select-question-bank/test", "src/app/api/Get_Question-Paper/route.tste.js"],
   "exclude": ["node_modules"]
 }

@@ -188,7 +188,16 @@ console.log("OPT",selectedOptions)
         submittedAnswers,
       }),
     });
+    
+    const params = new URLSearchParams(window.location.search);
+let course= params.get("course");
 
+let chapter= params.get("chapter");
+
+let subject= params.get("subject");
+let questionIds:string[]=[]
+questions.map((q)=>questionIds.push(q._id))
+let date=new Date().toISOString().slice(0, 10)
     const result = await response.json();
    
     // Optional: Save result to state or redirect to result page
@@ -196,7 +205,7 @@ console.log("OPT",selectedOptions)
       `Correct: ${result.correct}\nIncorrect: ${result.incorrect}\nUnanswered: ${result.unanswered.length}\nScore: ${result.score}\nPercentage: ${result.percentage}%`
     );
 
-    sessionStorage.setItem("testResult", JSON.stringify({ result, questions, submittedAnswers }));
+    sessionStorage.setItem("testResult", JSON.stringify({ result, questions, submittedAnswers,testDetails:{course,chapter,subject,questionIds,date,duration:30,totalMarks:questions.length * 4} }));
     localStorage.removeItem("testEndTime");
     // window.location.href = "/dashboard/student/result";
     Router.push("/dashboard/student/result");

@@ -43,7 +43,7 @@ export default function ManageQuestionPaper() {
         return;
       }
       const json = await res.json();
-      setQuestionPaper(json.QuestionPaper || []);
+      setQuestionPaper(json.tests || []);
       setIsLoading(false);
     };
 
@@ -133,13 +133,11 @@ export default function ManageQuestionPaper() {
                 <TableCell>{test.duration} min</TableCell>
                 <TableCell>{new Date(test.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={() => router.push(`/dashboard/admin/edit-test/${test._id}`)}>
-                    <Edit />
-                  </IconButton>
+                
                   <IconButton color="error" onClick={() => handleDelete(test._id)}>
                     <Delete />
                   </IconButton>
-                  <IconButton color="secondary" disabled title="Coming soon">
+                  <IconButton color="secondary" onClick={()=>router.push(`/dashboard/admin/printable-question-paper/${test?._id}`)}>
                     <PictureAsPdf />
                   </IconButton>
                 </TableCell>

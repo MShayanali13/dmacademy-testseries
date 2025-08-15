@@ -9,7 +9,9 @@ const QuestionPaperSchema = new Schema({
   questionIds: [{ type: Schema.Types.ObjectId, ref: "Question", required: true }],
   totalMarks: { type: Number, required: true },
   duration: { type: Number, required: true },
-  createdAt: { type: Date, default: Date.now },
+  
+  testType: { type: String, required: true },
+  date: { type: Date, default: Date.now },
 });
 
 export const QuestionPaper = models.QuestionPaper || model("QuestionPaper", QuestionPaperSchema);

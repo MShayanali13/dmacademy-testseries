@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Grid, MenuItem, TextField, Typography } from "@mui/material";
+import { Box, Grid, IconButton, InputAdornment, MenuItem, TextField, Typography } from "@mui/material";
+import ClearIcon from '@mui/icons-material/Clear';
 import { useEffect, useState } from "react";
 import Loading from "../loading";
 
@@ -189,13 +190,39 @@ useEffect(() => {
       )}
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <TextField label="Course" select fullWidth value={course} onChange={handleCourseChange}>
+          {/* <TextField label="Course" select fullWidth value={course} onChange={handleCourseChange}>
             {courses.map((c) => (
               <MenuItem key={c} value={c}>
                 {c}
               </MenuItem>
             ))}
-          </TextField>
+          </TextField> */}
+          <TextField
+  label="Course"
+  select
+  fullWidth
+  value={course} 
+  onChange={handleCourseChange}
+     SelectProps={{
+    IconComponent: course ? () => null : undefined, // show arrow only if not selected
+  }}
+  InputProps={{
+    endAdornment: course && (
+      <InputAdornment position="end">
+        <IconButton size="small" onClick={() => { setCourse(""); onCourseChange("");setSubject(""); onSubjectChange("");setChapter(""); onChapterChange(""); }}>
+          <ClearIcon fontSize="small" />
+        </IconButton>
+      </InputAdornment>
+    )
+  }}
+>
+  {courses.map((c) => (
+    <MenuItem key={c} value={c}>
+      {c}
+    </MenuItem>
+  ))}
+</TextField>
+
         </Grid>
 
         {/* <Grid item xs={12} sm={4}>
@@ -216,7 +243,7 @@ useEffect(() => {
         </Grid> */}
 
         <Grid item xs={12} sm={4}>
-          <TextField
+          {/* <TextField
             label="Subject"
             select
             fullWidth
@@ -230,11 +257,38 @@ useEffect(() => {
                 {s}
               </MenuItem>
             ))}
-          </TextField>
+          </TextField> */}
+          <TextField
+  label="Subject"
+  select
+  fullWidth
+  value={subject}
+  onChange={handleSubjectChange}
+  disabled={!course}
+    SelectProps={{
+    IconComponent: subject ? () => null : undefined, // show arrow only if not selected
+  }}
+  InputProps={{
+    endAdornment: subject && (
+      <InputAdornment position="end">
+        <IconButton size="small" onClick={() => { setSubject(""); onSubjectChange("");setChapter(""); onChapterChange(""); }}>
+          <ClearIcon fontSize="small" />
+        </IconButton>
+      </InputAdornment>
+    )
+  }}
+>
+  {subjects.map((s) => (
+    <MenuItem key={s} value={s}>
+      {s}
+    </MenuItem>
+  ))}
+</TextField>
+
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <TextField
+          {/* <TextField
             label="Chapter"
             select
             fullWidth
@@ -248,7 +302,34 @@ useEffect(() => {
                 {c}
               </MenuItem>
             ))}
-          </TextField>
+          </TextField> */}
+          <TextField
+  label="Chapter"
+  select
+  fullWidth
+  value={chapter}
+  onChange={handleChapterChange}
+  disabled={!subject}
+    SelectProps={{
+    IconComponent: chapter ? () => null : undefined, // show arrow only if not selected
+  }}
+  InputProps={{
+    endAdornment: chapter && (
+      <InputAdornment position="end">
+        <IconButton size="small" onClick={() => { setChapter(""); onChapterChange(""); }}>
+          <ClearIcon fontSize="small" />
+        </IconButton>
+      </InputAdornment>
+    )
+  }}
+>
+  {chapters.map((c) => (
+    <MenuItem key={c} value={c}>
+      {c}
+    </MenuItem>
+  ))}
+</TextField>
+
         </Grid>
       </Grid>
     </Box>

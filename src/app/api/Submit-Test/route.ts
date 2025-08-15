@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     
     const unanswered: string[] = [];
 
-    const totalQuestions = generatedQuestions.length;
+    const totalMarks = generatedQuestions.length*4;
 
     generatedQuestions.forEach((question, index) => {
       const selected = submittedAnswers[question._id];
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     });
 
     const score = correct * 4 - incorrect * 1;
-    const percentage = Math.round((score / totalQuestions) * 100);
+    const percentage = Math.round((score / totalMarks) * 100);
 
     return NextResponse.json({
       correct,

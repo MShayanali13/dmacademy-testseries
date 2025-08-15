@@ -27,6 +27,11 @@ export default function ResultPage() {
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [submittedAnswers, setSubmittedAnswers] = useState<string[]>([]);
+    const [test, setTest] = useState<{course:string;chapter:string;subject:string;questionIds:string[];date:string;duration:number;totalMarks:number;}>({
+      course:"-",
+      chapter:"-",
+      subject:"-",questionIds:[],date:"-",duration:0,totalMarks:0,
+    });
   
   const [answers, setAnswers] = useState<{id:string;ans:string;selected:string;}[]>([]);
   
@@ -76,10 +81,11 @@ export default function ResultPage() {
 
   try {
     const parsed = JSON.parse(stored);
-    const { result, questions, submittedAnswers } = parsed;
+    const { result, questions, submittedAnswers,testDetails } = parsed;
 
     setQuestions(questions || []);
 
+setTest(testDetails)
 
     setAnswers(result.Answers || []);
     
@@ -230,10 +236,68 @@ overflowX:"hidden"}}>
         </Button>
         
       </Box>
-      <Box id="result-pdf" sx={{mt:0,}}>
-      <Typography variant="h4" sx={{width:"100%",textAlign:"left"}} gutterBottom>
+      <Box id="result-pdf" sx={{m:5,border:"1px"}}>
+      {/* <Typography variant="h4" sx={{width:"100%",textAlign:"left"}} gutterBottom>
         Result Summary
-      </Typography>
+      </Typography> */}
+      
+          {/* TopBar */}
+          <div className="w-full border-b border-black flex justify-between items-center mb-2">
+            <div className="w-[85%]">
+              <h1 className="text-xl font-semibold px-5 py-3 uppercase">
+                D. M. Academy
+              </h1>
+            </div>
+            <div className="w-[15%] bg-black text-white text-center px-4 py-3 font-bold text-xl">
+              {test.course.toUpperCase()}
+            </div>
+          </div>
+
+          {/* Instructions */}
+          {/* <div className="border-b border-black mb-2 py-2 px-5 flex">
+            <div className="w-1/2">
+              <h2 className="text-lg font-semibold mb-1">Instructions:</h2>
+              <ul className="list-disc ml-5 space-y-1 text-md">
+                <li>All questions are compulsory unless stated otherwise.</li>
+                <li>Read each question carefully before answering.</li>
+                <li>No calculators or mobile phones allowed.</li>
+              </ul>
+            </div>
+            <div className="border border-dashed rounded-md p-2 mt-2 text-center italic font-medium w-1/2">
+              Best of Luck! Do Your Best.
+            </div>
+          </div> */}
+
+          {/* Metadata */}
+          <div className="w-full py-2 px-5 flex justify-between text-md mb-1">
+            <div className="flex flex-col">
+              <span>
+                <strong>Date:</strong> {new Date(test.date).toLocaleDateString()}
+              </span>
+              <span>
+                <strong>Duration:</strong> {test.duration / 60} hr
+              </span>
+            </div>
+            <div className="flex flex-col text-right">
+              <span>
+                <strong>Marks:</strong> {test.totalMarks}
+              </span>
+              <span>
+                <strong>Total Questions:</strong> {test.questionIds.length}
+              </span>
+            </div>
+          </div>
+
+          {/* Course/Subject/Chapter */}
+          <div className="w-full px-5 py-2 border-y-2 font-bold border-black text-xl text-center mb-1">
+            {test.course}
+            {test.subject!=="-" ? ` (${test.subject})` : ""}
+          </div>
+          {test.chapter!=="-" && (
+            <div className="w-full border-b px-5 py-2 font-bold border-black text-md text-center italic mb-1">
+              Chapter: {test.chapter}
+            </div>
+          )}
 
       {/* Summary Boxes */}
       <Grid container spacing={2} mb={4} mt={2}>

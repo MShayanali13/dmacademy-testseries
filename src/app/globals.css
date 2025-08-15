@@ -25,3 +25,41 @@ body {
         max-width: calc(100vw - 277px);
     }
 }
+
+@media print {
+          .print-header {
+            position: running(header);
+          }
+
+          @page {
+            margin: 1in;
+            @top-left {
+              content: element(header);
+            }
+          }
+
+          .no-print {
+            display: none;
+          }
+          
+        }
+
+      @media print {
+  .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+.two-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.left-column,
+.right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
