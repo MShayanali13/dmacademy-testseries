@@ -46,6 +46,11 @@ export default function AddTestPaper() {
   
   
   const [name, setName] = useState("");
+
+  
+  const [TeacherList, setTeacherList] = useState([]);
+
+  
   
   const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
 
@@ -90,6 +95,18 @@ const [filteredQuestions, setFilteredQuestions] = useState<QuestionType[]>([]);
       setSelectedIds([]);
     }
   };
+
+  useEffect(() => {
+    const fetchTeacherList = async () => {
+        
+    const res = await fetch(`/api/Get-Teacher-List`, {
+      cache: "no-store",
+    });
+    const json = await res.json();
+    if (json.list) setTeacherList(json.list);
+    };
+    fetchTeacherList();
+  }, []);
 
   const handleSaveTest = async () => {
     if (!date||!name || selectedIds.length === 0) {
@@ -416,8 +433,22 @@ useEffect(()=>{filterQuestions(questions,course,subject,chapter)},[course,questi
   <DialogContent dividers>
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <TextField label="Teacher Name" 
-            onChange={(e) => setName(e.target.value)} value={name} fullWidth  />
+        {/* <TextField label="Teacher Name" 
+            onChange={(e) => setName(e.target.value)} value={name} fullWidth  /> */}
+              <TextField
+  label="Teacher Name"
+  select
+  fullWidth
+  value={name} 
+  onChange={(e) => setName(e.target.value)}
+
+>
+  {TeacherList.map((item) => (
+    <MenuItem key={item} value={item}>
+      {item}
+    </MenuItem>
+  ))}
+</TextField>
       </Grid>
       {/* <Grid item xs={12}>
          <TextField

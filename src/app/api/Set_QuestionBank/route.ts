@@ -81,7 +81,7 @@ const processedQuestions = await Promise.all(
          course: q.course,
       subject: q.subject,
       chapter: q.chapter,
-      uploadedBy: 'admin', // Replace with actual user ID if available
+      uploadedBy:body.uploadedBy, // Replace with actual user ID if available
     };
   })
 );

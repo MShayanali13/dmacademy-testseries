@@ -157,20 +157,20 @@ async function generatePDFWithProgress(test: TestType, questions: QuestionType[]
 
     // metadata
     doc.line(marginX, yPos, marginX + innerWidth, yPos);
-    yPos += 5;
+    yPos += 6;
     doc.text(`Date: ${new Date(test.date).toLocaleDateString()}`, marginX + 4, yPos);
-    doc.text(`Duration: ${test.duration / 60} hr`, marginX + 4, yPos + 5);
+    doc.text(`Duration: ${test.duration>=60?(`${test.duration/60} hr`):`${test.duration} min`}`, marginX + 4, yPos + 5);
     doc.text(`Marks: ${test.totalMarks}`, marginX + innerWidth - 50, yPos);
     doc.text(`Questions: ${test.questionIds.length}`, marginX + innerWidth - 50, yPos + 5);
 
-    yPos += 12;
+    yPos += 6;
     doc.line(marginX, yPos, marginX + innerWidth, yPos);
 
     yPos += 6;
     if (test.chapter) {
       doc.setFont("helvetica", "italic");
       doc.text(`Chapter: ${test.chapter}`, marginX + innerWidth / 2, yPos, { align: "center" });
-      yPos += 6;
+      yPos += 2;
       doc.line(marginX, yPos, marginX + innerWidth, yPos);
     }
 

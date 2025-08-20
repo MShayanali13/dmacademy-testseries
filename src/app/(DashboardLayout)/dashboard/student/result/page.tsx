@@ -236,13 +236,13 @@ overflowX:"hidden"}}>
         </Button>
         
       </Box>
-      <Box id="result-pdf" sx={{m:5,border:"1px"}}>
+      <Box id="result-pdf" sx={{m:5,border:"1px solid black"}}>
       {/* <Typography variant="h4" sx={{width:"100%",textAlign:"left"}} gutterBottom>
         Result Summary
       </Typography> */}
       
           {/* TopBar */}
-          <div className="w-full border-b border-black flex justify-between items-center mb-2">
+          <div className="w-full border-b  border-black flex justify-between items-center mb-2">
             <div className="w-[85%]">
               <h1 className="text-xl font-semibold px-5 py-3 uppercase">
                 D. M. Academy
@@ -275,7 +275,7 @@ overflowX:"hidden"}}>
                 <strong>Date:</strong> {new Date(test.date).toLocaleDateString()}
               </span>
               <span>
-                <strong>Duration:</strong> {test.duration / 60} hr
+                <strong>Duration:</strong> {test.duration>=60?(`${test.duration/60} hr`):`${test.duration} min`}
               </span>
             </div>
             <div className="flex flex-col text-right">

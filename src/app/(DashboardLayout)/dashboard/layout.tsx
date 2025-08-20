@@ -65,6 +65,40 @@ if (typeof window !== 'undefined') {
   setIsTestPage(window?.location.pathname.includes("/student/test"))
 }
 },[])
+
+ const { user } = useUser();
+
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isLoaded) return; // Wait until Clerk is ready
+
+    if (!isSignedIn) {
+      router.push("/"); // Redirect on client
+      return;
+    }
+
+    // Fetch role from backend
+    async function fetchUserData() {
+      try {
+        const res = await fetch("/api/Get-Current-User");
+        const data = await res.json();
+        if (res.ok && data.user?.isSubscribed) {
+         
+          setIsSubscribed(data.user.isSubscribed)
+          console.log(isSubscribed)
+        }
+      } catch (error) {
+        console.error("Failed to fetch:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUserData();
+  }, [isLoaded, isSignedIn]);
+
 // useEffect(()=>{
 // if(isSignIn&&isTestPage){
 //   setIsLoading(false)
@@ -77,11 +111,11 @@ if(isLoading){
   return <Loading />
 }
   return (
-    <MainWrapper className="mainwrapper">
+    <MainWrapper className="mainwrapper bg-gray-50">
       {/* ------------------------------------------- */}
       {/* Sidebar */}
       {/* ------------------------------------------- */}
-      {!shouldHideSidebar && (  <Sidebar
+      {!shouldHideSidebar && isSubscribed && (  <Sidebar
         isSidebarOpen={isSidebarOpen}
         isMobileSidebarOpen={isMobileSidebarOpen}
         onSidebarClose={() => setMobileSidebarOpen(false)}
@@ -90,7 +124,7 @@ if(isLoading){
       {/* ------------------------------------------- */}
       {/* Main Wrapper */}
       {/* ------------------------------------------- */}
-      <PageWrapper className={`page-wrapper ${!isTestPage&&"custom-lg-xl:max-w-[calc(100vw-277px)]"}`}>
+      <PageWrapper className={`page-wrapper ${!isTestPage&&isSubscribed&&"custom-lg-xl:max-w-[calc(100vw-277px)]"}`}>
         {/* ------------------------------------------- */}
         {/* Header */}
         {/* ------------------------------------------- */}

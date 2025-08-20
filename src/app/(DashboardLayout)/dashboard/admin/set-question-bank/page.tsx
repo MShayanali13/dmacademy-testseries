@@ -6,6 +6,7 @@ import QuestionTypeSelector from "../../components/questionTypeSelector";
 import Loading from "@/app/loading";
 import PageContainer from "../../components/container/PageContainer";
 import { unstable_noStore as noStore } from "next/cache";
+import { useUser } from "@clerk/nextjs";
 
 export default function SetTest() {
 
@@ -39,7 +40,7 @@ export default function SetTest() {
   const [course, setCourse] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
   const [chapter, setChapter] = useState<string>('');
-
+ const { user } = useUser();
   // Handlers to update the state
   const handleLevelChange = (newLevel: string) => {
     setLevel(newLevel);
@@ -75,6 +76,7 @@ const handleSubmit = async () => {
         chapter, // Add the selected chapter
       };
     }),
+    uplodedBy:user?.username
   };
 
   // Log the data to console for debugging
