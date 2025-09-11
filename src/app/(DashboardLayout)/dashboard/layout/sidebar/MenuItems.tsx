@@ -35,7 +35,7 @@ const AdminMenuitems = [
     title: "Take A New Test",
  
     icon: IconCopy,
-    href: "/dashboard/student/select-test",
+    href: "/dashboard/student/select-your_test",
   },
   {
     navlabel: true,

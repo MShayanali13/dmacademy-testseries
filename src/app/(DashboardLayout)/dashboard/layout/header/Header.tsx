@@ -9,9 +9,10 @@ import { SignedOut, SignInButton, SignUpButton, SignedIn, UserButton } from '@cl
 
 interface ItemType {
   toggleMobileSidebar:  (event: React.MouseEvent<HTMLElement>) => void;
+  hide: boolean;
 }
 
-const Header = ({toggleMobileSidebar}: ItemType) => {
+const Header = ({toggleMobileSidebar, hide}: ItemType) => {
 
   // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   // const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
@@ -41,6 +42,7 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
   return (
     <AppBarStyled position="sticky" color="default">
       <ToolbarStyled>
+        {hide ? null :
         <IconButton
           color="inherit"
           aria-label="menu"
@@ -54,7 +56,7 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
         >
           <IconMenu width="20" height="20" />
         </IconButton>
-
+}
 
         <IconButton
           size="large"

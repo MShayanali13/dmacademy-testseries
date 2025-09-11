@@ -185,9 +185,10 @@ export default function ManageSubjectWithChapters() {
     });
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "SubjectWithChapters");
+    const dateStr = new Date().toISOString().slice(0, 10); // e.g. "2024-06-09"
+    XLSX.utils.book_append_sheet(workbook, worksheet, `SubjectWiseChapters_${dateStr}`);
 
-    XLSX.writeFile(workbook, "SubjectWithChapters.xlsx");
+    XLSX.writeFile(workbook, `SubjectWiseChapters_${dateStr}.xlsx`);
   };
 
 
@@ -197,7 +198,7 @@ export default function ManageSubjectWithChapters() {
   return (
     <PageContainer title="Manage Subject with Chapters" description="Manage subject and chapter data">
       <Box mb={3}>
-        <Typography variant="h4" mb={4}>Subject & Chapter</Typography>
+        <Typography variant="h4" mb={4}>Subject Wise Chapter</Typography>
 
 
      <Grid container spacing={2} sx={{ mt: 2 }}>

@@ -76,15 +76,22 @@ export default function QuestionCard({index, data, selectedOption, onSelect }: P
       onChange={() => onSelect(idx)}
     />
     {data.optionType === "text" ? (
-      <Typography>{option.text}</Typography>
+      <>
+      <Typography>
+        {["A)", "B)", "C)", "D)"].some(prefix => (option.text ?? "").trim().startsWith(prefix))
+          ? (option.text ?? "")
+          : `${["A)", "B)", "C)", "D)"][idx]} ${option.text ?? ""}`}
+      </Typography>
+      </>
     ) : (
-      <Image
-        src={option.imgUrl || ""}
-        alt={`Option ${idx + 1}`}
-        width={100}
-        height={100}
-        style={{ objectFit: "contain", minWidth:"100px", maxWidth:"200px", height:"auto" }}
-      />
+      <><Typography>
+          {["A)", "B)", "C)", "D)"][idx]}
+        </Typography><Image
+            src={option.imgUrl || ""}
+            alt={`Option ${idx + 1}`}
+            width={100}
+            height={100}
+            style={{ objectFit: "contain", minWidth: "100px", maxWidth: "200px", height: "auto" }} /></>
     )}
   </Box>
 ))}

@@ -1,466 +1,621 @@
+
+// const [questions, setQuestions] = useState<Question[]>([]);
+// const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
+// const [timeLeft, setTimeLeft] = useState<number>(0);
+// const [subjectTab, setSubjectTab] = useState<string>("");
+// const [loading, setLoading] = useState<boolean>(true);
+
+// pagination per subject
+// const [panelPageBySubject, setPanelPageBySubject] = useState<Record<string, number>>({});
+
+// Fetch questions
+// useEffect(() => {
+//   const fetchQuestions = async () => {
+//     setLoading(true);
+//     const res = await fetch("/api/Get-Questions-By-Type", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ testType, course, subject, chapter }),
+//     });
+//     const data = await res.json();
+//     if (data.success) {
+//       setQuestions(data.questions);
+//       const subjectsInTest = Array.from(new Set(data.questions.map((q: Question) => q.subject)));
+//       setSubjectTab(typeof subjectsInTest[0] === "string" ? subjectsInTest[0] : "");
+//       const endTime = Date.now() + data.duration * 1000;
+//       sessionStorage.setItem("testEndTime", String(endTime));
+//       setTimeLeft(data.duration); // trigger timer
+//     }
+//     setLoading(false);
+//   };
+//   fetchQuestions();
+// }, [testType, course, subject, chapter]);
+
+
+// const handleSelectOption = (qid: string, idx: number) => {
+//   setSelectedOptions((prev) => ({ ...prev, [qid]: idx }));
+// };
+
+// const handleSubmit = () => {
+//   console.log("Submitted:", selectedOptions);
+//   alert("Test submitted!");
+// };
+
+
+
 "use client";
-import { Box, Grid, Button, Typography } from "@mui/material";
-import { useState, useEffect, use, useRef } from "react";
+import { IconButton } from "@mui/material";
+import { ArrowBack, ArrowForward } from "@mui/icons-material";
+import { useEffect, useState, useRef } from "react";
+import {
+  Box,
+  Grid,
+  Button,
+  Typography,
+  Tabs,
+  Tab,
+  Paper,
+} from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import QuestionCard from "../../components/questionCard";
 import { Question } from "@/types/questionType";
-import { useRouter } from "next/navigation";
-import Loading from "../../loading";
+import Loading from "@/app/loading";
 
-import { unstable_noStore as noStore } from 'next/cache';
-import PageContainer from "../../components/container/PageContainer";
-import { object } from "zod";
+const QUESTIONS_PER_PANEL_PAGE = 25;
 
 export default function TestPage() {
-  // const [timeLeft, setTimeLeft] = useState(60 * 30); // 30 minutes timer (example)
+  const searchParams = useSearchParams();
+  const testType = searchParams.get("testType") || "mock";
+  const course = searchParams.get("course") || "jee";
+  const subject = searchParams.get("subject") || "";
+  const chapter = searchParams.get("chapter") || "";
+  
+  // ----------------- STATE -----------------
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [subjectTab, setSubjectTab] = useState<string>("");
+  const [panelPageBySubject, setPanelPageBySubject] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState<boolean>(true);
 
-  noStore()
+  const [duration, setDuration] = useState<number>(0); // in sec
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [activeQuestion, setActiveQuestion] = useState<number>(0);
 
-  const [timeLeft, setTimeLeft] = useState(0);
 
-useEffect(() => {
-  const duration = 60 * 30; // 30 minutes
-  const storageKey = "testEndTime";
 
-  let endTime = localStorage.getItem(storageKey);
-
-  if (!endTime) {
-    const newEndTime = Date.now() + duration * 1000;
-    localStorage.setItem(storageKey, newEndTime.toString());
-    endTime = newEndTime.toString();
-  }
-
-  const calculateTimeLeft = () => {
-    const diff = Math.floor((+endTime! - Date.now()) / 1000);
-    return diff > 0 ? diff : 0;
+// ----------------- TAB CHANGE -----------------
+  const handleTabChange = (_: any, val: string) => {
+    setSubjectTab(val);
+    setPanelPageBySubject((prev) => ({ ...prev, [val]: prev[val] || 1 }));
   };
 
-  setTimeLeft(calculateTimeLeft());
+// ----------------- ACTIVE PAGE -----------------
+  const activePage = panelPageBySubject[subjectTab] || 1;
+  const changePage = (page: number) => {
+    setPanelPageBySubject((prev) => ({ ...prev, [subjectTab]: page }));
+  };
 
-  const timer = setInterval(() => {
-    const newTimeLeft = calculateTimeLeft();
-    setTimeLeft(newTimeLeft);
+// ----------------- RESTORE SAVED DATA -----------------
+useEffect(() => {
+  const saved = sessionStorage.getItem("testState");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    setQuestions(parsed.questions || []);
+    setSelectedOptions(parsed.selectedOptions || {});
+    setSubjectTab(parsed.subjectTab || "");
+    setPanelPageBySubject(parsed.panelPageBySubject || {});
+    const endTime = parsed.endTime;
+    if (endTime) {
+      sessionStorage.setItem("testEndTime", String(endTime));
+      setTimeLeft(Math.max(0, Math.floor((endTime - Date.now()) / 1000)));
+    }
+    setLoading(false);
+    return;
+  }
+}, []);
 
-    if (newTimeLeft <= 0) {
-      clearInterval(timer);
-      localStorage.removeItem(storageKey); // optional: clear timer
+// ----------------- FETCH QUESTIONS (ONLY IF NOT RESTORED) -----------------
+useEffect(() => {
+  const saved = sessionStorage.getItem("testState");
+  if (saved) return; // already restored
+
+  const fetchQuestions = async () => {
+    setLoading(true);
+    const res = await fetch("/api/Get-Questions-By-Type", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ testType, course, subject, chapter }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setQuestions(data.questions);
+      const subjectsInTest = Array.from(new Set(data.questions.map((q: Question) => q.subject)));
+      setSubjectTab(String(subjectsInTest[0] || ""));
+      const endTime = Date.now() + data.duration * 1000;
+      setDuration(data.duration)
+console.log("Test duration (sec):", data.duration);
+      sessionStorage.setItem("testEndTime", String(endTime));
+      setTimeLeft(data.duration);
+      // Save initial state
+      sessionStorage.setItem(
+        "testState",
+        JSON.stringify({
+          questions: data.questions,
+          selectedOptions: {},
+          subjectTab: subjectsInTest[0] || "",
+          panelPageBySubject: {},
+          endTime,
+        })
+      );
+    }
+    setLoading(false);
+  };
+  fetchQuestions();
+}, [testType, course, subject, chapter]);
+
+// ----------------- AUTO-SAVE STATE -----------------
+useEffect(() => {
+  if (!questions.length) return;
+  const endTime = parseInt(sessionStorage.getItem("testEndTime") || "0", 10);
+  sessionStorage.setItem(
+    "testState",
+    JSON.stringify({
+      questions,
+      selectedOptions,
+      subjectTab,
+      panelPageBySubject,
+      endTime,
+    })
+  );
+}, [questions, selectedOptions, subjectTab, panelPageBySubject]);
+
+// ----------------- TIMER -----------------
+useEffect(() => {
+  const savedEnd = sessionStorage.getItem("testEndTime");
+  if (!savedEnd) return;
+  const endTime = parseInt(savedEnd, 10);
+
+  const interval = setInterval(() => {
+    const diff = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+    setTimeLeft(diff);
+    if (diff <= 0) clearInterval(interval);
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [questions.length]);
+
+// ----------------- SELECT OPTION -----------------
+const handleSelectOption = (qid: string, idx: number) => {
+  setSelectedOptions((prev) => ({ ...prev, [qid]: idx }));
+  console.log("Selected:", { ...selectedOptions, [qid]: idx })
+};
+
+
+// ----------------- Format Time -----------------
+  const formatTime = (sec: number) => {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    return `${h > 0 ? h + ":" : ""}${m.toString().padStart(2, "0")}:${s
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  // ----------------- FILTERED QUESTIONS & PAGINATION -----------------
+  const subjects = Array.from(new Set(questions.map((q) => q.subject)));
+  const filteredQuestions = questions.filter((q) => q.subject === subjectTab);
+
+  const totalPanelPages = Math.ceil(filteredQuestions.length / QUESTIONS_PER_PANEL_PAGE);
+  const panelQuestions = filteredQuestions.slice(
+    (activePage - 1) * QUESTIONS_PER_PANEL_PAGE,
+    activePage * QUESTIONS_PER_PANEL_PAGE
+  );
+
+  // ----------------- SCROLL TO QUESTION -----------------
+  const scrollToQuestion = (idx: number) => {
+    questionRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // ----------------- Timer sticky -----------------
+  const [isTimerSticky, setIsTimerSticky] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setIsTimerSticky(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // ----------------- Panel sticky -----------------
+  const [isPanelSticky, setIsPanelSticky] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setIsPanelSticky(window.scrollY > 95);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Answered/unanswered for active tab only
+  const answeredCount = filteredQuestions.filter((q) => selectedOptions[q._id] !== undefined).length;
+  const unansweredCount = filteredQuestions.length - answeredCount;
+
+
+//  ------------------ Render Pagination ----------------
+const renderPagination = (total: number, current: number) => {
+  const pages: (number | "...")[] = [];
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    if (current <= 3) {
+      pages.push(1, 2, 3, "...", total);
+    } else if (current >= total - 2) {
+      pages.push(1, "...", total - 2, total - 1, total);
+    } else {
+      pages.push(1, "...", current - 1, current, current + 1, "...", total);
+    }
+  }
+
+  return (
+    <Box display="flex" alignItems="center" gap={1}>
+      {/* Prev Arrow */}
+      <IconButton
+        size="small"
+        disabled={current === 1}
+        onClick={() => changePage(current - 1)}
+        sx={{
+          bgcolor: "#f1f1f1",
+          "&:hover": { bgcolor: "#ddd" },
+          border: "1px solid #ccc",
+        }}
+      >
+        <ArrowBack fontSize="small" />
+      </IconButton>
+
+      {/* Page Numbers */}
+      {pages.map((p, i) =>
+        p === "..." ? (
+          <Typography key={i} px={1}>
+            ...
+          </Typography>
+        ) : (
+          <Button
+            key={i}
+            onClick={() => changePage(p)}
+            sx={{
+              minWidth: 38,
+              height: 38,
+              borderRadius: "50%",
+              fontWeight: 600,
+              bgcolor: p === current ? "primary.main" : "#f5f5f5",
+              color: p === current ? "white" : "black",
+              border: "1px solid #ccc",
+              "&:hover": {
+                bgcolor: p === current ? "primary.dark" : "#e0e0e0",
+              },
+              boxShadow:
+                p === current ? "0 2px 6px rgba(33,150,243,0.4)" : "none",
+            }}
+          >
+            {p}
+          </Button>
+        )
+      )}
+
+      {/* Next Arrow */}
+      <IconButton
+        size="small"
+        disabled={current === total}
+        onClick={() => changePage(current + 1)}
+        sx={{
+          bgcolor: "#f1f1f1",
+          "&:hover": { bgcolor: "#ddd" },
+          border: "1px solid #ccc",
+        }}
+      >
+        <ArrowForward fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+};
+
+// ----------------- TIMER -----------------
+useEffect(() => {
+  const savedEnd = sessionStorage.getItem("testEndTime");
+  if (!savedEnd) return;
+  const endTime = parseInt(savedEnd, 10);
+
+  const interval = setInterval(() => {
+    const diff = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+    setTimeLeft(diff);
+
+    if (diff <= 0) {
+      clearInterval(interval);
+      handleSubmit(); // ⬅️ Auto-submit when time over
     }
   }, 1000);
 
-  return () => clearInterval(timer);
-}, []);
-
-
-  // Countdown timer logic
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-  //   }, 1000);
-  //   return () => clearInterval(timer);
-  // }, []);
-
-  // Format time nicely (mm:ss)
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  };
-
-
-  const [questions, setQuestions] = useState<Question[]>([
-    // {
-    //   _id: "1",
-    //   questionType: "text",
-    //   optionType: "text",
-    //   question: {
-    //     text: "What is 2 + 2?"
-    //   },
-    //   options: [
-    //     { text: "3" },
-    //     { text: "4" },
-    //     { text: "5" },
-    //     { text: "6" },
-    //   ],
-    //   answer: "B",
-    //   level: "Easy",
-    //   subject: "Mathematics",
-    //   chapter: "Addition",
-    //   uploadedBy: "admin",
-    // },
-    // {
-    //   _id: "2",
-    //   questionType: "image",
-    //   optionType: "image",
-    //   question: {
-    //     imgUrl: "/images/question.png",
-    //   },
-    //   options: [
-    //     { imgUrl: "/images/option1.png" },
-    //     { imgUrl: "/images/option2.png" },
-    //     { imgUrl: "/images/option3.png" },
-    //     { imgUrl: "/images/option4.png" },
-    //   ],
-    //   answer: "C",
-    //   level: "Medium",
-    //   subject: "Science",
-    //   chapter: "Plants",
-    //   uploadedBy: "admin",
-    // },
-  ]);
-  
-  
-  const [loading, setLoading] = useState(true);
-  
-  const generateTest = async () => {
-    const params = new URLSearchParams(window.location.search);
-    const level = params.get("level");
-      const course = params.get("course");
-    const subject = params.get("subject");
-    const chapter = params.get("chapter");
-
-    if (level && course && subject && chapter) {
-      try {
-        const response = await fetch("/api/Generate-Test", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            level,
-            course,
-            subject,
-            chapter,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        setQuestions(data.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching questions:", error);
-      }
-    }
-  }
-useEffect(() => {
-  
-  generateTest();
-},[])
-
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
-
-
-
-  const handleSelectOption = (questionID: string, optionIndex: number) => {
-    setSelectedOptions((prev) => ({ ...prev, [questionID]: optionIndex }));
-  };
-
-  const Router=useRouter();
-
-
-const handleSubmit = async () => {
-  try {
-    const submittedAnswers: Record<string, string> = {};
-
-    Object.entries(selectedOptions).forEach(([qID, optIndex]) => {
-      const question = questions.find(q => q._id === qID);
-
-      if (!question) return;
-
-      // Convert 0-based option index to A/B/C/D
-      const optionLetter = String.fromCharCode(65 + +optIndex);
-      submittedAnswers[qID] = optionLetter;
-    });
-console.log('ANS',submittedAnswers)
-console.log("OPT",selectedOptions)
-    const response = await fetch("/api/Submit-Test", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        generatedQuestions: questions,
-        submittedAnswers,
-      }),
-    });
-    
-    const params = new URLSearchParams(window.location.search);
-let course= params.get("course");
-
-let chapter= params.get("chapter");
-
-let subject= params.get("subject");
-let questionIds:string[]=[]
-questions.map((q)=>questionIds.push(q._id))
-let date=new Date().toISOString().slice(0, 10)
-    const result = await response.json();
-   
-    // Optional: Save result to state or redirect to result page
-    alert(
-      `Correct: ${result.correct}\nIncorrect: ${result.incorrect}\nUnanswered: ${result.unanswered.length}\nScore: ${result.score}\nPercentage: ${result.percentage}%`
-    );
-
-    sessionStorage.setItem("testResult", JSON.stringify({ result, questions, submittedAnswers,testDetails:{course,chapter,subject,questionIds,date,duration:30,totalMarks:questions.length * 4} }));
-    localStorage.removeItem("testEndTime");
-    // window.location.href = "/dashboard/student/result";
-    Router.push("/dashboard/student/result");
-  } catch (error) {
-    console.error("Submit error:", error);
-  }
-};
-  
-
-
-useEffect(() => {
-  const handleScroll = () => {
-    const centerY = window.innerHeight / 2;
-    let closestIdx = 0;
-    let closestDist = Infinity;
-    questionRefs.current.forEach((el, idx) => {
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        const elCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(elCenter - centerY);
-        if (dist < closestDist) {
-          closestDist = dist;
-          closestIdx = idx;
-        }
-      }
-    });
-    setActiveQuestion(closestIdx);
-  };
-
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  return () => window.removeEventListener("scroll", handleScroll);
+  return () => clearInterval(interval);
 }, [questions.length]);
 
+// ----------------- SUBMIT -----------------
+const handleSubmit = () => {
+  if (!questions.length) return;
 
-    if (loading) {
-      return (
-      <Loading />
-      );
+  // Build the result object
+  // const answers = questions.map((q) => ({
+  //   id: q._id,
+  //   ans: q.answer || "",
+  //   selected: selectedOptions[q._id] !== undefined
+  //     ? q.options[selectedOptions[q._id]]?.text || "Skipped"
+  //     : "Skipped",
+  // }));
+  const answers = questions.map((q) => {
+  const selectedIdx = selectedOptions[q._id];
+  return {
+    id: q._id,
+    ans: q.answer !== undefined ? q.answer : "",
+    selected:
+      selectedIdx !== undefined
+        ? String.fromCharCode(65 + selectedIdx) // "A", "B", "C", ...
+        : "Skipped",
+  };
+});
+
+console.log("Submitting answers:", answers);
+  const correct = answers.filter(a => a.selected.toLocaleLowerCase() !== "skipped" && a.ans === a.selected).length;
+  const incorrect = answers.filter(a => a.selected.toLocaleLowerCase() !== "skipped" && a.ans !== a.selected).length;
+  const unanswered = answers.filter(a => a.selected.toLocaleLowerCase() === "skipped");
+
+  const score = correct * 4 - incorrect; // Or calculate marks if needed
+  const percentage = questions.length > 0 ? (score / questions.length * 100) : 0;
+
+  // Save to sessionStorage
+  sessionStorage.setItem(
+    "testResult",
+    JSON.stringify({
+      result: { correct, incorrect, unanswered, score, percentage, Answers: answers },
+      questions,
+      submittedAnswers: selectedOptions,
+      testDetails: {
+        course,
+        subject,
+        chapter,
+        questionIds: questions.map(q => q._id),
+        date: new Date().toISOString(),
+        duration: duration, // in sec
+        totalMarks: questions.length,
+        testType
+      }
+    })
+  );
+
+  // Clean sessionStorage test state
+  sessionStorage.removeItem("testState");
+  sessionStorage.removeItem("testEndTime");
+
+  // Redirect to result page
+  window.location.href = "/dashboard/student/result";
+};
+
+
+useEffect(() => {
+  // Prevent Back/Forward navigation
+  window.history.pushState(null, "", window.location.href);
+  const handlePopState = () => {
+    window.history.pushState(null, "", window.location.href);
+    alert("You cannot navigate away during the test!");
+  };
+  window.addEventListener("popstate", handlePopState);
+
+  // Block reload (F5 / Ctrl+R / Right-click reload)
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (
+      (e.key === "F5") ||
+      ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r")
+    ) {
+      e.preventDefault();
+      alert("Reload is disabled during the test!");
     }
+  };
+  window.addEventListener("keydown", handleKeyDown);
 
+  // Optional: block context menu reload
+  const handleContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
+  };
+  window.addEventListener("contextmenu", handleContextMenu);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+    window.removeEventListener("keydown", handleKeyDown);
+    window.removeEventListener("contextmenu", handleContextMenu);
+  };
+}, []);
+
+  if (loading)
+    return (
+   <Loading />
+    );
+
+    const totalQuestions = questions.length;
+const answeredQuesCount = Object.keys(selectedOptions).length;
+const leftCount = totalQuestions - answeredQuesCount;
+
+// alert(`${testType === "mock" } ${subjects.length > 1} ${questions.length>25}`)
   return (
-      <PageContainer title="Test" description="this is test page" >
-        
-        <Typography variant="h4" sx={{mt:"70px",display: { xs: "block", md: "none" }}} gutterBottom>
-            Test
-          </Typography>
-             <Typography variant="h4" sx={{mt:"20px",display: { xs: "none", md: "block" }}} gutterBottom>
-            Test
-          </Typography>
-    <Grid container spacing={5} gap={5} className="justify-center md:justify-start" sx={{ height: "calc(100vh - 80px)",paddingLeft:"0px", maxWidth:"100vw" }}>
-     
-      {
-        questions.length!==0?(
-          <>
+    <Box>
+      {/* Top sticky div with Tabs + Pagination */}
+      {(testType === "mock" || subjects.length > 1 || questions.length>25) && (<Box
+        sx={{
+
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: "center",
+          justifyContent: testType === "mock" && subjects.length > 1 ?"space-between":"end",
+          border: "1px solid #ddd",
+          borderRadius: 2,
+          bgcolor: "#fff",
+          px: 2,
+          py: 1,
+          mx: 2,
+          // position: "sticky",
+          top: 0,
+          mb: 1,
+          zIndex: 99,
+        }}
+      >
+        {testType === "mock" && subjects.length > 1 && (
+        <Tabs
+          value={subjectTab}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{ flexGrow: 1 }}
+        >
+          {subjects.map((sub) => (
+            
+            <Tab key={sub} label={sub} value={sub} />
+          ))}
+        </Tabs>
+        )}
+        {totalPanelPages > 1 && (
+          <Box mt={{ xs: 1, md: 0 }} >{renderPagination(totalPanelPages, activePage)}</Box>
+        )}
+      </Box>
+      )}
+
+      <Grid container spacing={2} sx={{ px: 2 }}>
+        {/* Left Side - Questions */}
+        <Grid item xs={12} md={8} alignItems={"center"} display={"flex"} flexDirection={"column"}>
+          {/* Timer */}
           <Box
             sx={{
-              position: "fixed",
-              top: 80,
-              width: "90vw",
-              // marginLeft:"16px",
-              alignSelf: "center",
-              zIndex: 10,
-              justifyContent:"space-between",
-              backgroundColor: "#fb9a09",
-              borderRadius: 2,
-              color: "white",
-justifySelf:"anchor-center",
-              p: 1.5,
+              fontWeight: 500,
+              py: 1,
+              px: window.innerWidth > 400 ? 10 : 3,
               textAlign: "center",
-              display: { xs: "flex", md: "none" },
+              borderRadius: 2,
+              position: isTimerSticky ? "fixed" : "unset",
+              top: isTimerSticky ? 80 : "auto",
+              width: isTimerSticky
+                ? { xs: "95%", md: "550px", lg: "700px" }
+                : { xs: "100%", md: "100%" },
+              zIndex: 100,
+              bgcolor: "#fff59d",
+              border: "1px solid #fdd835",
+              display:"flex",
+              justifyContent:"space-between",
+              mb: 2,
+              transition: "top 0.5s",
             }}
           >
-          
-            <Typography variant="h6" fontWeight="bold">
-              Time Left: {formatTime(timeLeft)}
-            </Typography>
-              <Typography variant="h6" fontWeight="bold">
-              Ques. Left: {questions.length - Object.keys(selectedOptions).length}
-            </Typography>
+            <Box>Time Left: {formatTime(timeLeft)}</Box>
+            <Box>Ques. Left: {leftCount}</Box>
+
           </Box>
-          
-          <Grid
-            item
-            xs={12}
-            md={8}
-            
-            sx={{
-              minHeight: "100vh",
-              pr: { md: 2 },
-              marginTop:"15px"
-            }}
-          >
-              {questions.map((q, index) => (
-                <div
-                  key={q._id}
-                  ref={el => questionRefs.current[index] = el}
-                >
-               <QuestionCard
-                  key={index}
-                  index={index}
+
+          {/* Questions */}
+          {panelQuestions.map((q, idx) => {
+            const globalIdx = (activePage - 1) * QUESTIONS_PER_PANEL_PAGE + idx;
+            return (
+              <div key={q._id} style={{width:"100%"}} ref={(el) => (questionRefs.current[globalIdx] = el)}>
+                <QuestionCard
+                  index={globalIdx}
                   data={q}
                   selectedOption={selectedOptions[q._id] ?? null}
-                  onSelect={(optionIdx) => handleSelectOption(q._id, optionIdx)} />
-                  </div>
-              ))}
+                  onSelect={(optionIdx) => handleSelectOption(q._id, optionIdx)}
+                />
+              </div>
+            );
+          })}
 
-            </Grid><Grid
-              item
-              xs={12}
-              md={4}
-              sx={{
-                display: { xs: "none", md: "flex" },
-                flexDirection: "column",
-                gap: 1,
-                position: "fixed", // <-- use sticky, not -webkit-sticky
-    top: "70px",
-    width:"-webkit-fill-available",
-    right:"66px",
-    paddingRight:"24px",
-           // <-- stick 80px from the top (adjust as needed)
-    // height:"400px",
-    // maxHeight: "calc(100vh - 80px)", // ✅ Adjusted to screen
-    overflowY: "auto", // ✅ Enables scrolling if needed
-    justifyContent: "center", // <-- ensures sticky works inside flex/grid
-              }}
+          {/* Mobile Submit */}
+          <Box display={{ xs: "block", md: "none" }} sx={{width:"100%"}} mt={2}>
+            <Button fullWidth color="error" variant="contained" onClick={handleSubmit}>
+              Submit Test
+            </Button>
+          </Box>
+        </Grid>
+
+        {/* Right Side - Navigator */}
+        <Grid item xs={0} md={4} sx={{ px: 2 }}>
+          <Paper
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              boxShadow: 3,
+              position: isPanelSticky ? "fixed" : "relative",
+              top: isPanelSticky ? 85 : "auto",
+              width: isPanelSticky ? (window.innerWidth < 900 ? "calc(100% - 16px)" : "27%") : "100%",
+              zIndex: 90,
+              display: { xs: "none", md: "block" },
+              maxHeight: "80vh",
+              overflowY: "auto",
+              transition: "top 0.5s",
+            }}
+          >
+            <Typography variant="h6" mb={1}>
+              Questions
+            </Typography>
+
+            {/* Answered / Unanswered (active tab only) */}
+            <Box mt={2} mb={2} display="flex" justifyContent="space-between">
+              <Typography color="success.main">Answered: {answeredCount}</Typography>
+              <Typography color="error">Unanswered: {unansweredCount}</Typography>
+            </Box>
+
+            <Grid container spacing={1} >
+              {panelQuestions.map((q, idx) => {
+                const globalIdx = (activePage - 1) * QUESTIONS_PER_PANEL_PAGE + idx;
+                const answered = selectedOptions[q._id] !== undefined;
+                return (
+                  <Grid item xs={2} key={q._id}>
+                    <button
+                      style={{
+                        width: "100%",
+                        fontWeight: 600,
+                        padding: "5px",
+                        borderRadius: "4px",
+                        backgroundColor: answered ? "#4caf50" : "#f9f9f9ff",
+                        color: answered ? "#fff" : "#000",
+                        cursor: "pointer",
+                        border: "1px solid #ccc",
+                        transition: "background 0.2s",
+                        boxShadow: answered
+                          ? "0 2px 6px rgba(76,175,80,0.15)"
+                          : "0 1px 3px rgba(0,0,0,0.07)",
+                      }}
+                      onClick={() => scrollToQuestion(globalIdx)}
+                      onMouseOver={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.backgroundColor = answered
+                          ? "#43a047"
+                          : "#bdbdbd";
+                      }}
+                      onMouseOut={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.backgroundColor = answered
+                          ? "#4caf50"
+                          : "#f9f9f9ff";
+                      }}
+                    >
+                      {globalIdx + 1}
+                    </button>
+                  </Grid>
+                );
+              })}
+            </Grid>
+
+            {/* Submit Button */}
+            <Button
+              fullWidth
+              color="error"
+              variant="contained"
+              sx={{ mt: 1 }}
+              onClick={handleSubmit}
             >
-              <Box
-                sx={{
-                  p: 1.5,
-                  backgroundColor: "#fb9a09",
-                  borderRadius: 2,
-                  textAlign: "center",
-                  color: "white",
-                  justifyContent:"space-between",
-                  display:"flex",
-                  marginTop:0
-                }}
-              >
-                <Box sx={{display:"flex"}}>
-                  <Typography variant="h6">Time Left:  </Typography>
-                <Typography variant="h6" ml="5px" fontWeight="bold">
-                  {formatTime(timeLeft)}
-                </Typography>
-                </Box>
-                <Box sx={{display:"flex"}}>
-                  <Typography variant="h6">Ques. Left:  </Typography>
-                <Typography variant="h6" ml="5px" fontWeight="bold">
-                  {questions.length-Object.keys(selectedOptions).length}
-                </Typography>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(5, 1fr)",
-                  gap: 0.5,
-                  backgroundColor: "#f1f1f1",
-                  p: 1.5,
-                  borderRadius: 2,
-                }}
-              >
-             
-                {/* {questions.map((_, index) => (
-  <Button
-    key={index}
-    variant={selectedOptions[index] !== undefined ? "contained" : "outlined"}
-    size="small"
-    sx={{
-      minWidth: "32px",
-      padding: "2px",
-      backgroundColor: selectedOptions[index] !== undefined ? "#4caf50" : "white",
-      color: selectedOptions[index] !== undefined ? "white" : "black",
-    }}
-  >
-    {index + 1}
-  </Button>
-))} */}
-{questions.map((q, index) => (
-  <Button
-    key={q._id}
-    variant={ "outlined" }
-    size="small"
-    sx={{
-      minWidth: "32px",
-      padding: "2px",
-      ":hover":{
- backgroundColor:
-        selectedOptions[q._id] !== undefined
-          ? "#4caf50" // green if answered
-          : activeQuestion === index
-          ? "#1976d2" // blue if active and not answered
-          : "white",
-      color:
-        selectedOptions[q._id] !== undefined
-          ? "white"
-          : activeQuestion === index
-          ? "white"
-          : "black",
-      },
-     backgroundColor:
-        selectedOptions[q._id] !== undefined
-          ? "#4caf50" // green if answered
-          : activeQuestion === index
-          ? "#1976d2" // blue if active and not answered
-          : "white",
-      color:
-        selectedOptions[q._id] !== undefined
-          ? "white"
-          : activeQuestion === index
-          ? "white"
-          : "black",
-    }}
-     onClick={() => {
-  const el = questionRefs.current[index];
-  if (el) {
-    setActiveQuestion(index); // Set active immediately
-    const y = el.getBoundingClientRect().top + window.scrollY - 150; // 80px offset from top
-    window.scrollTo({ top: y, behavior: "smooth" });
-  }
-}}
-  >
-    {index + 1}
-  </Button>
-))}
-              </Box>
-
-              <Button variant="contained" onClick={handleSubmit}  color="error" size="large">
-                Submit Test
-              </Button>
-            </Grid><Box
-              sx={{
-                ml: 6,
-                pb: 5,
-                width:"100%",
-                
-                justifyContent:"start",
-                display: { xs: "flex", md: "none" },
-              }}
-            >
-              <Button
-                variant="contained"
-                color="error"
-                size="large"
-                onClick={handleSubmit}
-              >
-                Submit Test
-              </Button>
-            </Box></>
-  ):(
-    <h2>No Question Ready For this test..</h2>
-  )
-}
-
-</Grid>
-</PageContainer>
+              Submit Test
+            </Button>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

@@ -56,10 +56,10 @@ const Dashboard = () => {
 isSubscribed==true?(        
         <span className="text-gray-500">Role: {role}</span>
 ):(
-  <h2>Subscrition Needed</h2>
+  // <h2>Subscrition Needed</h2>
+<PricingSection />
 )
 }
-<PricingSection />
       </div>
     </PageContainer>
   );

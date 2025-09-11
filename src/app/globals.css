@@ -8,7 +8,98 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* #result-pdf {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: white;
+   padding: mm; 
+  box-sizing: border-box;
+} */
 
+#result-pdf {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: white;
+  box-sizing: border-box;
+  display: none; /* hide on webpage */
+  padding: 5mm; /* optional, looks good in PDF */
+}
+
+
+.pdf-only {
+  display: none;
+  margin: 0 auto;
+}
+.web-only {
+  display: block;
+  margin: 0 auto;
+}
+/* 
+.print-mode .pdf-only {
+  display: block !important;
+}
+.print-mode .web-only {
+  display: none !important;
+}
+ */
+
+/* Option bubbles (A, B, C, D) */
+.option-circle {
+ padding-left: 6px !important;
+ padding-right: 6px !important;
+  padding-bottom:6px !important; 
+  padding-top:6px !important;   
+  height:auto !important; /* 👈 tiny adjustment to avoid cutoff */
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  height: auto;                 /* instead of fixed 32px */
+  min-height: 22px;             /* safe minimum */
+  padding: 4px 12px;            /* balanced padding */
+  border-radius: 16px;
+  font-family: '__Plus_Jakarta_Sans_e62c24', '__Plus_Jakarta_Sans_Fallback_e62c24', Helvetica, Arial, sans-serif;
+  font-size: 0.9rem;             /* better readability */
+  font-weight: 600;
+  line-height: 1.2;              /* fixes bottom cutoff */
+  box-sizing: border-box;
+  cursor: unset;
+  outline: 0;
+  border: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  vertical-align: middle;
+  background-color: #1976d2;     /* default CET bg */
+  color: white;                  /* default CET text */
+}
+
+
+/* Prevent shifting on PDF render */
+html, body {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+#result-pdf table {
+  page-break-inside: auto;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#result-pdf tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+
+#result-pdf td, 
+#result-pdf th {
+  page-break-inside: avoid;
+}
 
 body {
   background: var(--background);

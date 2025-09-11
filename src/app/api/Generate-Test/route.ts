@@ -10,12 +10,12 @@ export async function POST(req: Request) {
     try {
         // Parse the request body
         const body = await req.json();
-        const { level, subject, chapter,course } = body;
+        const { level, subject, chapter, course } = body;
 
         // Validate the required fields
-        if (!level || !subject || !chapter || !course) {
+        if (!course) {
             return NextResponse.json(
-                { error: 'Missing required fields: level, subject, or chapter or course' },
+                { error: 'Missing required field: course' },
                 { status: 400 }
             );
         }
@@ -23,20 +23,25 @@ export async function POST(req: Request) {
         // Connect to the database
         await connectDB();
 
+        // Build match criteria based on available fields
+        let matchCriteria: any = { course };
+        
+        if (subject && subject.trim() !== '') {
+            matchCriteria.subject = subject;
+        }
+        
+        if (chapter && chapter.trim() !== '') {
+            matchCriteria.chapter = chapter;
+        }
+
         // Fetch data from the Question schema with filters and limit
         const questions = await QuestionBankSchema.aggregate([
-  {
-    $match: {
-      level,
-      subject,
-      chapter,
-      course,
-    },
-  },
-  { $sample: { size: 50 } }, // randomly select 50 documents
-]);
+            {
+                $match: matchCriteria,
+            },
+            { $sample: { size: 50 } }, // randomly select 50 documents
+        ]);
            
-
         // Return the fetched data
         return NextResponse.json({ success: true, data: questions });
     } catch (error) {

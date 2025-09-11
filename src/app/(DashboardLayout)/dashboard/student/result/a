@@ -1,5 +1,4 @@
 "use client";
-
 import { useSearchParams } from "next/navigation";
 import {
   Box,
@@ -128,51 +127,222 @@ const [generatingPdf, setGeneratingPdf] = useState(false);
     }
   }, []);
 
-// const handleDownload = (e: { preventDefault: () => void; }) => {
-//   e.preventDefault();
+  // const handleDownload = async () => {
+  //   const element = document.getElementById("result-pdf");
+  //   if (!element) return;
+
+  //   try {
+  //     // Show loading state
+  //     const downloadBtn = document.getElementById("download-btn");
+  //     if (downloadBtn) {
+  //       downloadBtn.innerHTML = "Generating PDF...";
+  //       downloadBtn.setAttribute("disabled", "true");
+  //     }
+
+  //     // Clone the element for PDF generation
+  //     const clone = element.cloneNode(true) as HTMLElement;
+  // clone.style.width = "1200px";
+  // clone.style.padding = "40px";
+  // clone.style.background = "#fff";
+  // clone.style.color = "#000";
+  // clone.style.position = "fixed";
+  // clone.style.left = "50%";
+  // clone.style.top = "-9999px"; // pull far above the viewport without 200vw trick
+  // clone.style.transform = "translateX(-50%)";
+  // clone.style.zIndex = "9999";
+      
+  //     // Add print-specific styles for better PDF layout
+  //     clone.style.fontSize = "14px";
+  //     clone.style.lineHeight = "1.4";
+      
+  //     document.body.appendChild(clone);
+
+  //     // Wait for images to load
+  //     const images = clone.querySelectorAll("img");
+  //     const loadPromises = Array.from(images).map((img) =>
+  //       new Promise<void>((resolve) => {
+  //         if (img.complete) resolve();
+  //         else {
+  //           img.onload = () => resolve();
+  //           img.onerror = () => resolve();
+  //         }
+  //       })
+  //     );
+  //     await Promise.all(loadPromises);
+
+  //     // Generate canvas with higher quality
+  //     const canvas = await html2canvas(clone, {
+  //       scale: 2,
+  //       useCORS: true,
+  //       logging: false,
+  //       backgroundColor: "#ffffff",
+  //       allowTaint: true,
+  //       foreignObjectRendering: true,
+  //     });
+
+  //     // Generate PDF
+  //     const imgData = canvas.toDataURL("image/png", 1.0);
+  //     const pdf = new jsPDF("p", "mm", "a4");
+  //     const pdfWidth = pdf.internal.pageSize.getWidth();
+  //     const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  //     const imgProps = pdf.getImageProperties(imgData);
+  //     const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+  //     let heightLeft = imgHeight;
+  //     let position = 0;
+  //     let pageCount = 1;
+
+  //     // Add first page
+  //     pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+  //     heightLeft -= pdfHeight;
+
+  //     // Add additional pages if content is longer than one page
+  //     while (heightLeft > 0) {
+  //       position = heightLeft - imgHeight;
+  //       pdf.addPage();
+  //       pageCount++;
+        
+  //       // Add page number at bottom
+  //       pdf.setFontSize(10);
+  //       pdf.setTextColor(128);
+  //       pdf.text(`Page ${pageCount}`, pdfWidth / 2, pdfHeight - 10, { align: 'center' });
+        
+  //       pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+  //       heightLeft -= pdfHeight;
+  //     }
+
+  //     // Add header to first page
+  //     pdf.setFontSize(12);
+  //     pdf.setTextColor(0);
+  //     pdf.text("D. M. Academy - Test Result", 20, 20);
+  //     pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
+
+  // const safeCourse = String(test.course || 'test').replace(/[^a-z0-9-_]/gi, '-');
+  // pdf.save(`test-result-${safeCourse}-${new Date().toISOString().slice(0, 10)}.pdf`);
+  //     document.body.removeChild(clone);
+
+  //     // Reset button
+  //     if (downloadBtn) {
+  //       downloadBtn.innerHTML = "Download PDF";
+  //       downloadBtn.removeAttribute("disabled");
+  //     }
+  //   } catch (error) {
+  //     console.error("PDF generation error:", error);
+  //     alert("Error generating PDF. Please try again.");
+      
+  //     // Reset button on error
+  //     const downloadBtn = document.getElementById("download-btn");
+  //     if (downloadBtn) {
+  //       downloadBtn.innerHTML = "Download PDF";
+  //       downloadBtn.removeAttribute("disabled");
+  //     }
+  //   }
+  // };
+  // 
+  
+//   const handleDownload = () => {
 //   const element = document.getElementById("result-pdf");
 //   if (!element) return;
-// setGeneratingPdf(true);
-//   // Show element for PDF rendering
-//   element.style.display = "block";
-
-//     const parts = [`${test.course}`];
-//   if (test.subject && test.subject !== "-") parts.push(test.subject);
-//   if (test.chapter && test.chapter !== "-") parts.push(test.chapter);
-//   if (test.date) parts.push(new Date(test.date).toISOString().slice(0, 10));
-//   const filename = `test-result-${parts.join('-')}.pdf`;
 
 //   const opt = {
-//     margin:       0.2, // mm
-//     filename:     filename,
-//     image:        { type: "jpeg", quality: 1 },
-//     html2canvas:  { dpi: 300, useCORS: true, scrollY: 0, scale: 2 },
-//     jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" },
-//     pagebreak:    { mode: ["avoid-all", "css", "legacy"] },
+//     margin: [0, 0, 0, 0], // small margin all sides
+//     filename: `test-result-${test.course}-${new Date().toISOString().slice(0, 10)}.pdf`,
+//     image: { type: "jpeg", quality: 1, },
+//     html2canvas: { 
+//       scale: 3, 
+//       useCORS: true, 
+//       scrollY: 0, 
+      
+//       letterRendering: true 
+//     },
+    
+//     jsPDF: { unit: "px", format: "a4", orientation: "portrait" },
+//     pagebreak: { mode: ["avoid-all", "css", "legacy"] }
 //   };
 
-//   html2pdf().set(opt).from(element).save().then(() => {
-//     element.style.display = "none"; // hide after PDF
-//     setGeneratingPdf(false);
-//   });
+//   html2pdf().set(opt).from(element).save();
 // };
 
-const handleDownload = async (e: { preventDefault: () => void }) => {
+// const element = document.getElementById("result-pdf");
+
+//   // const opt = {
+  //   //   margin: [0, 0, 0, 0], // no extra margin
+//   //   filename: `test-result-${test.course}-${new Date()
+//   //     .toISOString()
+//   //     .slice(0, 10)}.pdf`,
+//   //   image: { type: "jpeg", quality: 1 },
+//   //   html2canvas: {
+//   //     scale: 2, // sharper text
+//   //     useCORS: true,
+//   //     scrollY: 0,
+//   //   },
+//   //   jsPDF: {
+//   //     unit: "px", // use pixels
+//   //     format: [794, 1123], // exact A4 size at 96dpi
+//   //     orientation: "portrait",
+//   //   },
+//   //   pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+//   // };
+// const opt = {
+//   margin: [5, 5, 5, 5], // small margins
+//   filename: `test-result-${test.course}-${new Date().toISOString().slice(0, 10)}.pdf`,
+//   image: { type: "jpeg", quality: 1 },
+//   html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+//   jsPDF: {
+//     unit: "mm",        // 👈 use millimeters, not px
+//     format: "a4",      // 👈 exact paper size
+//     orientation: "portrait",
+//   },
+//   pagebreak: { mode: ["avoid-all", "css", "legacy"] }
+// };
+
+
+
+
+//   html2pdf().set(opt).from(element).save();
+
+// const handleDownload = () => {
+// const element = document.getElementById("result-pdf");
+
+// if (!element) return;
+
+// element.style.display="block"
+
+// const opt = {
+//   margin: 1,
+//   filename: "result.pdf",
+//   image: { type: "jpeg", quality: 1 },
+//   html2canvas: { dpi: 300, useCORS: true, scrollY: 0 },
+//   jsPDF: { unit: "px", orientation: "portrait" },
+//   pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+// };
+
+// // Trick: set print media emulation
+// // document.body.classList.add("print-mode");
+
+// html2pdf().set(opt).from(element).save().then(() => {
+//   // document.body.classList.remove("print-mode");
+//   element.style.display="none"
+// });
+// };
+
+const handleDownload = (e: { preventDefault: () => void; }) => {
   e.preventDefault();
   const element = document.getElementById("result-pdf");
   if (!element) return;
-
-  setGeneratingPdf(true);
+setGeneratingPdf(true);
+  // Show element for PDF rendering
   element.style.display = "block";
 
-  const parts = [`${test.course}`];
+    const parts = [`${test.course}`];
   if (test.subject && test.subject !== "-") parts.push(test.subject);
   if (test.chapter && test.chapter !== "-") parts.push(test.chapter);
   if (test.date) parts.push(new Date(test.date).toISOString().slice(0, 10));
   const filename = `test-result-${parts.join('-')}.pdf`;
 
   const opt = {
-    margin:       0.2,
+    margin:       0.2, // mm
     filename:     filename,
     image:        { type: "jpeg", quality: 1 },
     html2canvas:  { dpi: 300, useCORS: true, scrollY: 0, scale: 2 },
@@ -180,10 +350,8 @@ const handleDownload = async (e: { preventDefault: () => void }) => {
     pagebreak:    { mode: ["avoid-all", "css", "legacy"] },
   };
 
-  const html2pdf = (await import("html2pdf.js")).default;
-  
   html2pdf().set(opt).from(element).save().then(() => {
-    element.style.display = "none";
+    element.style.display = "none"; // hide after PDF
     setGeneratingPdf(false);
   });
 };
@@ -386,7 +554,18 @@ const subjectsGroupedBySubject = Array.from(
 >
   {test.course.toUpperCase()}
 </span>
-                
+                  {/* <Chip
+                    label={test.course.toUpperCase()}
+                    className="chip"
+                    sx={{ 
+                      backgroundColor: '#1976d2', 
+                      color: 'white',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold',
+                      px: 2,
+                      py: 1
+                    }}
+                  /> */}
                 </Box>
 
                 {/* Test Details Grid */}
@@ -637,7 +816,124 @@ const subjectsGroupedBySubject = Array.from(
                           </TableCell>
                         </TableRow>
                       </TableHead>
-                     
+                      {/* <TableBody>
+                        {questions.map((q, i) => {
+                          const answerObj = answers.find(a => a.id === q._id);
+                          const selected = answerObj;
+                            
+                            // Determine result: "⧗ Skipped", "✅ Correct", "❌ Incorrect"
+                            const result =
+                            selected?.selected.toLocaleLowerCase() === "skipped"
+                              ? "⧗ Skipped"
+                              : selected?.selected === q.answer
+                              ? "✅ Correct"
+                              : "❌ Incorrect";
+                          const color = result === "✅ Correct" ? "#4caf50" : result === "❌ Incorrect" ? "#f44336" : "#9e9e9e";
+
+                          return (
+                            <TableRow key={i} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#fafafa' } }}>
+                              <TableCell sx={{ 
+                                border: "1px solid #e0e0e0",
+                                py: 2,
+                                px: 1,
+                                textAlign: "center",
+                                maxWidth: "60px"
+                              }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'semibold', color: '#1976d2' }}>
+                                  {i + 1}
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell sx={{ border: "1px solid #e0e0e0", py: 2, px: 2 }}>
+                                
+                                <Box sx={{ mb: 2 }}>
+                                  {q.questionType === "text" ? (
+                                    <Typography variant="body1" sx={{ fontSize: "12px", fontWeight: 500, mb: 2 }}>
+                                      {q.question.text}
+                                    </Typography>
+                                  ) : (
+                                    <Box component="img" 
+                                      src={q.question.imgUrl} 
+                                      alt="question" 
+                                      crossOrigin="anonymous"
+                                      sx={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', mb: 2 }}
+                                    />
+                                  )}
+                                </Box>
+
+                                
+                                <Box sx={{ pl: 2 ,borderTop:"1px solid #e0e0e0"}}>
+                                  <Typography variant="subtitle2" sx={{ fontWeight: 'semibold', mb: 1, color: '#666' }}>
+                                    Options:
+                                  </Typography>
+                                  {q.options.map((option, idx) => (
+                                    <Box key={idx} sx={{ 
+                                      mb: 1, 
+                                      pl: 2,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 1
+                                    }}>
+                                   
+                                      <span 
+  className="chip" 
+  style={{ backgroundColor: "#e3f2fd", color: "#2A3547",fontWeight:"300",padding: "6px 12px 6px 12px" }}
+>
+  {String.fromCharCode(65 + idx)}
+</span>
+                                      {q.optionType === "text" ? (
+                                        <Typography variant="body2" sx={{ fontSize: "12px" }}>
+                                          {option.text}
+                                        </Typography>
+                                      ) : (
+                                        <Box component="img" 
+                                          src={option.imgUrl} 
+                                          alt="option" 
+                                          crossOrigin="anonymous"
+                                          sx={{ maxWidth: '60px', objectFit: 'contain' }}
+                                        />
+                                      )}
+                                    </Box>
+                                  ))}
+                                </Box>
+                              </TableCell>
+
+                              <TableCell sx={{ border: "1px solid #e0e0e0", py: 2, px: 2, maxWidth: "240px",minWidth:"180px" }}>
+                                {q.hintType === "text" ? (
+                                  <Typography variant="body2" sx={{ fontSize: "12px", fontStyle: 'italic' }}>
+                                    {q.hint.text || "—"}
+                                  </Typography>
+                                ) : (
+                                  <Box component="img" 
+                                    src={q.hint.imgUrl} 
+                                    alt="hint" 
+                                    crossOrigin="anonymous"
+                                    sx={{ maxWidth: '100%', objectFit: 'contain' }}
+                                  />
+                                )}
+                              </TableCell>
+
+                              <TableCell sx={{ border: "1px solid #e0e0e0", py: 2, px: 1.5, maxWidth: "220px",minWidth:"180px" }}>
+                                <Box sx={{ textAlign: 'center' }}>
+                                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'semibold' }}>
+                                    Your Answer: <b>{selected?.selected || "Skipped"}</b>
+                                  </Typography>
+                                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'semibold' }}>
+                                    Correct Answer: <b>{q.answer}</b>
+                                  </Typography>
+                                  <Divider sx={{ my: 1 }} />
+                                  <span 
+  className="chip" 
+  style={{ backgroundColor: color, color: "white",padding: "6px 12px 6px 12px" }}
+>
+  {result}
+</span>
+                                </Box>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody> */}
                      <TableBody>
   {test.testType === "mock"
     ?
@@ -928,7 +1224,18 @@ console.log("Selected answer:", selected?.selected, "Correct answer:", q.answer,
 >
   {test.course.toUpperCase()}
 </span>
-                
+                  {/* <Chip
+                    label={test.course.toUpperCase()}
+                    className="chip"
+                    sx={{ 
+                      backgroundColor: '#1976d2', 
+                      color: 'white',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold',
+                      px: 2,
+                      py: 1
+                    }}
+                  /> */}
                 </Box>
 
                 {/* Test Details Grid */}
