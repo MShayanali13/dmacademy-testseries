@@ -218,7 +218,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongoose";
 import QuestionBankSchema from "@/model/QuestionBankSchema";
 import { unstable_noStore as noStore } from "next/cache";
-import MOCK_CONFIG from "@/utils/MOCK_CONFIG";
+import MOCK_CONFIG from "@/utils/mock_config";
 
 /** ================= TYPES ================= **/
 type CourseType = keyof typeof MOCK_CONFIG;
