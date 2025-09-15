@@ -218,8 +218,51 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongoose";
 import QuestionBankSchema from "@/model/QuestionBankSchema";
 import { unstable_noStore as noStore } from "next/cache";
-import MOCK_CONFIG from "@/utils/mock_config";
-
+// import MOCK_CONFIG from "@/utils/mock_config";
+const MOCK_CONFIG = {
+  JEE: {
+    mockTest: { questions: 200, duration: 180 }, // 3 hrs
+    subjectWise: {
+      Physics: { questions: 60, duration: 70 },
+      Chemistry: { questions: 60, duration: 70 },
+      Maths: { questions: 60, duration: 70 },
+    },
+    chapterWise: { questions: 45, duration: 60 },
+  },
+  NEET: {
+    mockTest: { questions: 200, duration: 180 },
+    subjectWise: {
+      Physics: { questions: 60, duration: 70 },
+      Chemistry: { questions: 60, duration: 70 },
+      Biology: { questions: 80, duration: 80 },
+    },
+    chapterWise: {
+      Physics: { questions: 45, duration: 60 },
+      Chemistry: { questions: 45, duration: 60 },
+      Biology: { questions: 60, duration: 60 },
+    },
+  },
+  CET: {
+    mockTest: { questions: 120, duration: 120 },
+    subjectWise: {
+      Maths: { questions: 50, duration: 50 },
+      Physics: { questions: 45, duration: 60 },
+      Chemistry: { questions: 45, duration: 60 },
+      Biology: { questions: 45, duration: 60 }, // optional if PCB
+    },
+    chapterWise: { questions: 45, duration: 60 },
+  },
+  Foundation: {
+    mockTest: { questions: 120, duration: 120 },
+    subjectWise: {
+      Maths: { questions: 40, duration: 60 },
+      Physics: { questions: 40, duration: 60 },
+      Chemistry: { questions: 40, duration: 60 },
+      Biology: { questions: 40, duration: 60 },
+    },
+    chapterWise: { questions: 40, duration: 60 },
+  },
+} as const;
 /** ================= TYPES ================= **/
 type CourseType = keyof typeof MOCK_CONFIG;
 type TestType = "mock" | "subject" | "chapter";
